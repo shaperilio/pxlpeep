@@ -1366,15 +1366,28 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             if (!forwarded)
             {
                 if (mods == Qt::ControlModifier)
+                {
                     snapWindowTo(Left, -1);
-                else if (mods == (Qt::ControlModifier | Qt::ShiftModifier))
+                    break;
+                }
+                if (mods == (Qt::ControlModifier | Qt::ShiftModifier))
+                {
                     snapWindowTo(TopLeft, -1);
-                else if (mods == (Qt::AltModifier     | Qt::ShiftModifier))
+                    break;
+                }
+                if (mods == (Qt::AltModifier     | Qt::ShiftModifier))
+                {
                     snapWindowTo(BottomLeft, -1);
-            }
-            else
+                    break;
+                }
                 if (mods == Qt::NoModifier)
+                {
                     readPrevImage();
+                    break;
+                }
+            }
+            if (mods == Qt::NoModifier)
+                readPrevImage();
             break;
         }
         case Qt::Key_Right:
@@ -1382,15 +1395,28 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             if (!forwarded)
             {
                 if (mods == Qt::ControlModifier)
+                {
                     snapWindowTo(Right, -1);
-                else if (mods == (Qt::ControlModifier | Qt::ShiftModifier))
+                    break;
+                }
+                if (mods == (Qt::ControlModifier | Qt::ShiftModifier))
+                {
                     snapWindowTo(TopRight, -1);
-                else if (mods == (Qt::AltModifier     | Qt::ShiftModifier))
+                    break;
+                }
+                if (mods == (Qt::AltModifier     | Qt::ShiftModifier))
+                {
                     snapWindowTo(BottomRight, -1);
-            }
-            else
+                    break;
+                }
                 if (mods == Qt::NoModifier)
-                    readNextImage();
+                {
+                    readPrevImage();
+                    break;
+                }
+            }
+            if (mods == Qt::NoModifier)
+                readNextImage();
             break;
         }
         case Qt::Key_Up:
