@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=pxlpeep
+GenericName=Image Viewer
+X-GNOME-FullName=pxlpeep Image Viewer
+Comment=Look at it. LOOK AT IT.
+Exec=/home/shaperilio/pxlpeep/build-pxlpeep-Desktop_Qt_5_12_1_GCC_64bit-Release/pxlpeep %F
+Icon=/home/shaperilio/pxlpeep/loupe.ico
+Terminal=true
+Type=Application
+MimeType=image/bmp;image/x-psd;image/tiff;image/jpeg;image/png;
