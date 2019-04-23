@@ -96,8 +96,6 @@ bool ImageWindow::readImage(QString filename)
     int lastSlash = curFilename.lastIndexOf('/');
     curDirectory = curFilename.left(lastSlash + 1);
 
-    syncWithFolder();
-
     return translateImage();
 }
 
@@ -1275,10 +1273,7 @@ void ImageWindow::saveImageToFile()
     filename = insertBeforeExtension(fi.absoluteDir().filePath(fi.baseName()), suffix);
     filename +=  ".png";
     if(translatedImage.save(filename))
-    {
         cout << "Saved translated image to " << filename.toStdString() << endl;
-        syncWithFolder();
-    }
     else
         cerr << "Failed to save translated image to " << filename.toStdString() << endl;
 
@@ -1334,10 +1329,7 @@ void ImageWindow::saveScreenshotToFile()
     QString suffix = QString("_screenshot_") + QString::number(QDateTime::currentMSecsSinceEpoch()) + QString(".png");
     QString filename = curFilename + suffix;
     if(image.save(filename))
-    {
         cout << "Saved screenshot image to " << filename.toStdString() << endl;
-        syncWithFolder();
-    }
     else
         cerr << "Failed to save screenshot image to " << filename.toStdString() << endl;
 
@@ -1411,7 +1403,7 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                 }
                 if (mods == Qt::NoModifier)
                 {
-                    readPrevImage();
+                    readNextImage();
                     break;
                 }
             }
@@ -1739,15 +1731,26 @@ void ImageWindow::syncWithFolder()
     fileListPos = -1;
 
     for (int i = 0; i < fileList.length(); i++)
-        if (curFilename == curDirectory + fileList.at(i))
+    {
+        QString listFilename = curDirectory + fileList.at(i);
+        if (curFilename == listFilename)
         {
             fileListPos = i;
-            break;
+            cout << "-->";
+//            break;
         }
+        else
+        {
+            cout << "   ";
+        }
+        cout << " listing at " << i << " is " << listFilename.toStdString() << endl;
+    }
+    cout << endl;
 }
 
 bool ImageWindow::readNextImage()
 {
+    syncWithFolder(); // to make sure we update the folder just before we attempt to go to the next image.
     if (fileList.length() == 0) return false;
     if (fileList.length() == 1) return true;
 
@@ -1756,11 +1759,16 @@ bool ImageWindow::readNextImage()
     else
         fileListPos++;
 
-   return readImage(curDirectory + fileList.at(fileListPos));
+    QString nextFile = curDirectory + fileList.at(fileListPos);
+    cout << "will read " << nextFile.toStdString() << endl;
+    bool result = readImage(nextFile);
+    syncWithFolder(); // to reset our location in the file list, in case we loaded the image correctly.
+    return result;
 }
 
 bool ImageWindow::readPrevImage()
 {
+    syncWithFolder();
     if (fileList.length() == 0) return false;
     if (fileList.length() == 1) return true;
 
@@ -1769,7 +1777,11 @@ bool ImageWindow::readPrevImage()
     else
         fileListPos--;
 
-    return readImage(curDirectory + fileList.at(fileListPos));
+    QString nextFile = curDirectory + fileList.at(fileListPos);
+    cout << "will read " << nextFile.toStdString() << endl;
+    bool result = readImage(nextFile);
+    syncWithFolder();
+    return result;
 }
 
 #include <QDir>
