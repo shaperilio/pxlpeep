@@ -1175,7 +1175,7 @@ void ImageWindow::snapWindowTo(snapType snap, int screenNum)
         resize(screenDims.width()/2 - 2*halfBorder, screenDims.height()/2 - 2*halfBorder);
         break;
     case BottomRight:
-        if (currentSnap == BottomLeft)
+        if (currentSnap == BottomRight)
         {
             screenNum = desktop->screenNumber(geometry().topLeft());
             int i;
