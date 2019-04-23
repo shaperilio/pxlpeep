@@ -39,6 +39,8 @@ public slots:
 
 protected:
     void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE; //to prevent ESC from closing the window.
+    void dragEnterEvent(QDragEnterEvent *e) Q_DECL_OVERRIDE;
+    void dropEvent(QDropEvent *e) Q_DECL_OVERRIDE;
 
     int nextButton;                     //keeps track of the next available button in the main window.
     static const int MAX_BUTTONS = 10;  //put this many buttons in the dialog box.

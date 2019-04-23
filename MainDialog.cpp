@@ -19,6 +19,9 @@ MainDialog::MainDialog(QWidget *parent) :
                          Qt::CustomizeWindowHint |
                          Qt::WindowTitleHint |
                          Qt::WindowMinimizeButtonHint);
+
+    setAcceptDrops(true);
+
     ui->setupUi(this);
 
     setWindowTitle(QString("pxlpeep ") + QString(VERSION_STRING));
@@ -284,6 +287,34 @@ void MainDialog::keyPressEvent(QKeyEvent *e)
 {
     if(e->key() != Qt::Key_Escape)
         QDialog::keyPressEvent(e);
+}
+
+#include <QMimeData>
+// To enable dragging and dropping:
+// 1. Accept the proposed action on enter, then
+// 2. Handle actually doing something on drop.
+void MainDialog::dragEnterEvent(QDragEnterEvent *e)
+{
+    const QMimeData *m = e->mimeData();
+    if (m->hasUrls())
+        e->acceptProposedAction();
+}
+
+void MainDialog::dropEvent(QDropEvent *e)
+{
+    const QMimeData *m = e->mimeData();
+    if (m->hasUrls())
+    {
+        QList<QUrl> urls = m->urls();
+        cout << "Drag drop event with " << urls.length() << " URL(s):" << endl;
+        for (QUrl url : urls)
+        {
+            QString filename = url.toLocalFile();
+            cout << filename.toStdString() << endl;
+            openAndShow(-1, filename);
+        }
+        e->acceptProposedAction();
+    }
 }
 
 int MainDialog::exec()
