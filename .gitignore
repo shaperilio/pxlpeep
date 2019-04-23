@@ -1,3 +1,6 @@
+# QtCreator stuff
+*.pro.user
+
 # =========================
 # Operating System Files
 # =========================
