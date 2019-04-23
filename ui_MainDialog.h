@@ -122,7 +122,7 @@ public:
         btnClose->setGeometry(QRect(660, 360, 111, 31));
         chkSyncWindows = new QCheckBox(MainDialog);
         chkSyncWindows->setObjectName(QStringLiteral("chkSyncWindows"));
-        chkSyncWindows->setGeometry(QRect(10, 370, 300, 17));
+        chkSyncWindows->setGeometry(QRect(10, 365, 300, 27));
 
         retranslateUi(MainDialog);
 
