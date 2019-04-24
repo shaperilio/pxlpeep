@@ -1736,16 +1736,9 @@ void ImageWindow::syncWithFolder()
         if (curFilename == listFilename)
         {
             fileListPos = i;
-            cout << "-->";
-//            break;
+            break;
         }
-        else
-        {
-            cout << "   ";
-        }
-        cout << " listing at " << i << " is " << listFilename.toStdString() << endl;
     }
-    cout << endl;
 }
 
 bool ImageWindow::readNextImage()
@@ -1760,7 +1753,6 @@ bool ImageWindow::readNextImage()
         fileListPos++;
 
     QString nextFile = curDirectory + fileList.at(fileListPos);
-    cout << "will read " << nextFile.toStdString() << endl;
     bool result = readImage(nextFile);
     syncWithFolder(); // to reset our location in the file list, in case we loaded the image correctly.
     return result;
@@ -1778,7 +1770,6 @@ bool ImageWindow::readPrevImage()
         fileListPos--;
 
     QString nextFile = curDirectory + fileList.at(fileListPos);
-    cout << "will read " << nextFile.toStdString() << endl;
     bool result = readImage(nextFile);
     syncWithFolder();
     return result;
