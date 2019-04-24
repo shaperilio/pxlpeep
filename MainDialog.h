@@ -42,7 +42,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *e) Q_DECL_OVERRIDE;
     void dropEvent(QDropEvent *e) Q_DECL_OVERRIDE;
 
-    int nextButton;                     //keeps track of the next available button in the main window.
+    int nextButton = 0;                 //keeps track of the next available button in the main window.
     static const int MAX_BUTTONS = 10;  //put this many buttons in the dialog box.
     QPushButton *imgButtons[MAX_BUTTONS];
     ImageWindow *imgWindows[MAX_BUTTONS];
@@ -62,7 +62,7 @@ protected:
 
     void resetButton(int ID);
 
-    bool syncWindows;
+    bool syncWindows = false;
     void connectSignals(int ID); //Connect signals to and from imageWindows.
 
     QStringList deletedFilesList;

@@ -80,7 +80,7 @@ void MainDialog::slot_btnImage_clicked()
 
 void MainDialog::on_chkSyncWindows_stateChanged(int arg1)
 {
-    syncWindows = (arg1 == 2);
+    syncWindows = static_cast<bool>(arg1 == 2);
     if (syncWindows)
     {
         for (int i = 0; i < MAX_BUTTONS; i++)
