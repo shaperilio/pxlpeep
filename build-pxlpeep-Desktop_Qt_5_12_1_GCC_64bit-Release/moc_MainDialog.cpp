@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainDialog_t {
-    QByteArrayData data[21];
-    char stringdata0[355];
+    QByteArrayData data[22];
+    char stringdata0[377];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -32,30 +32,31 @@ struct qt_meta_stringdata_MainDialog_t {
 static const qt_meta_stringdata_MainDialog_t qt_meta_stringdata_MainDialog = {
     {
 QT_MOC_LITERAL(0, 0, 10), // "MainDialog"
-QT_MOC_LITERAL(1, 11, 19), // "on_btnClose_clicked"
-QT_MOC_LITERAL(2, 31, 0), // ""
-QT_MOC_LITERAL(3, 32, 21), // "slot_btnImage_clicked"
-QT_MOC_LITERAL(4, 54, 30), // "on_chkSyncWindows_stateChanged"
-QT_MOC_LITERAL(5, 85, 4), // "arg1"
-QT_MOC_LITERAL(6, 90, 23), // "wheelEventInImageWindow"
-QT_MOC_LITERAL(7, 114, 12), // "QWheelEvent*"
-QT_MOC_LITERAL(8, 127, 5), // "event"
-QT_MOC_LITERAL(9, 133, 8), // "windowID"
-QT_MOC_LITERAL(10, 142, 28), // "mousePressEventInImageWindow"
-QT_MOC_LITERAL(11, 171, 12), // "QMouseEvent*"
-QT_MOC_LITERAL(12, 184, 27), // "mouseMoveEventInImageWindow"
-QT_MOC_LITERAL(13, 212, 30), // "mouseReleaseEventInImageWindow"
-QT_MOC_LITERAL(14, 243, 23), // "keyPressedInImageWindow"
-QT_MOC_LITERAL(15, 267, 10), // "QKeyEvent*"
-QT_MOC_LITERAL(16, 278, 24), // "keyReleasedInImageWindow"
-QT_MOC_LITERAL(17, 303, 4), // "exec"
-QT_MOC_LITERAL(18, 308, 23), // "imageWindowDeletedAFile"
-QT_MOC_LITERAL(19, 332, 8), // "QString&"
-QT_MOC_LITERAL(20, 341, 13) // "trashLocation"
+QT_MOC_LITERAL(1, 11, 18), // "on_btnExit_clicked"
+QT_MOC_LITERAL(2, 30, 0), // ""
+QT_MOC_LITERAL(3, 31, 22), // "on_btnCloseAll_clicked"
+QT_MOC_LITERAL(4, 54, 21), // "slot_btnImage_clicked"
+QT_MOC_LITERAL(5, 76, 30), // "on_chkSyncWindows_stateChanged"
+QT_MOC_LITERAL(6, 107, 4), // "arg1"
+QT_MOC_LITERAL(7, 112, 23), // "wheelEventInImageWindow"
+QT_MOC_LITERAL(8, 136, 12), // "QWheelEvent*"
+QT_MOC_LITERAL(9, 149, 5), // "event"
+QT_MOC_LITERAL(10, 155, 8), // "windowID"
+QT_MOC_LITERAL(11, 164, 28), // "mousePressEventInImageWindow"
+QT_MOC_LITERAL(12, 193, 12), // "QMouseEvent*"
+QT_MOC_LITERAL(13, 206, 27), // "mouseMoveEventInImageWindow"
+QT_MOC_LITERAL(14, 234, 30), // "mouseReleaseEventInImageWindow"
+QT_MOC_LITERAL(15, 265, 23), // "keyPressedInImageWindow"
+QT_MOC_LITERAL(16, 289, 10), // "QKeyEvent*"
+QT_MOC_LITERAL(17, 300, 24), // "keyReleasedInImageWindow"
+QT_MOC_LITERAL(18, 325, 4), // "exec"
+QT_MOC_LITERAL(19, 330, 23), // "imageWindowDeletedAFile"
+QT_MOC_LITERAL(20, 354, 8), // "QString&"
+QT_MOC_LITERAL(21, 363, 13) // "trashLocation"
 
     },
-    "MainDialog\0on_btnClose_clicked\0\0"
-    "slot_btnImage_clicked\0"
+    "MainDialog\0on_btnExit_clicked\0\0"
+    "on_btnCloseAll_clicked\0slot_btnImage_clicked\0"
     "on_chkSyncWindows_stateChanged\0arg1\0"
     "wheelEventInImageWindow\0QWheelEvent*\0"
     "event\0windowID\0mousePressEventInImageWindow\0"
@@ -74,7 +75,7 @@ static const uint qt_meta_data_MainDialog[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -82,30 +83,32 @@ static const uint qt_meta_data_MainDialog[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   69,    2, 0x08 /* Private */,
-       3,    0,   70,    2, 0x08 /* Private */,
-       4,    1,   71,    2, 0x08 /* Private */,
-       6,    2,   74,    2, 0x08 /* Private */,
-      10,    2,   79,    2, 0x08 /* Private */,
-      12,    2,   84,    2, 0x08 /* Private */,
-      13,    2,   89,    2, 0x08 /* Private */,
-      14,    2,   94,    2, 0x08 /* Private */,
-      16,    2,   99,    2, 0x08 /* Private */,
-      17,    0,  104,    2, 0x0a /* Public */,
-      18,    1,  105,    2, 0x0a /* Public */,
+       1,    0,   74,    2, 0x08 /* Private */,
+       3,    0,   75,    2, 0x08 /* Private */,
+       4,    0,   76,    2, 0x08 /* Private */,
+       5,    1,   77,    2, 0x08 /* Private */,
+       7,    2,   80,    2, 0x08 /* Private */,
+      11,    2,   85,    2, 0x08 /* Private */,
+      13,    2,   90,    2, 0x08 /* Private */,
+      14,    2,   95,    2, 0x08 /* Private */,
+      15,    2,  100,    2, 0x08 /* Private */,
+      17,    2,  105,    2, 0x08 /* Private */,
+      18,    0,  110,    2, 0x0a /* Public */,
+      19,    1,  111,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,    5,
-    QMetaType::Void, 0x80000000 | 7, QMetaType::Int,    8,    9,
-    QMetaType::Void, 0x80000000 | 11, QMetaType::Int,    8,    9,
-    QMetaType::Void, 0x80000000 | 11, QMetaType::Int,    8,    9,
-    QMetaType::Void, 0x80000000 | 11, QMetaType::Int,    8,    9,
-    QMetaType::Void, 0x80000000 | 15, QMetaType::Int,    8,    9,
-    QMetaType::Void, 0x80000000 | 15, QMetaType::Int,    8,    9,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,    6,
+    QMetaType::Void, 0x80000000 | 8, QMetaType::Int,    9,   10,
+    QMetaType::Void, 0x80000000 | 12, QMetaType::Int,    9,   10,
+    QMetaType::Void, 0x80000000 | 12, QMetaType::Int,    9,   10,
+    QMetaType::Void, 0x80000000 | 12, QMetaType::Int,    9,   10,
+    QMetaType::Void, 0x80000000 | 16, QMetaType::Int,    9,   10,
+    QMetaType::Void, 0x80000000 | 16, QMetaType::Int,    9,   10,
     QMetaType::Int,
-    QMetaType::Void, 0x80000000 | 19,   20,
+    QMetaType::Void, 0x80000000 | 20,   21,
 
        0        // eod
 };
@@ -116,18 +119,19 @@ void MainDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         auto *_t = static_cast<MainDialog *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->on_btnClose_clicked(); break;
-        case 1: _t->slot_btnImage_clicked(); break;
-        case 2: _t->on_chkSyncWindows_stateChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 3: _t->wheelEventInImageWindow((*reinterpret_cast< QWheelEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 4: _t->mousePressEventInImageWindow((*reinterpret_cast< QMouseEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 5: _t->mouseMoveEventInImageWindow((*reinterpret_cast< QMouseEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 6: _t->mouseReleaseEventInImageWindow((*reinterpret_cast< QMouseEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 7: _t->keyPressedInImageWindow((*reinterpret_cast< QKeyEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 8: _t->keyReleasedInImageWindow((*reinterpret_cast< QKeyEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 9: { int _r = _t->exec();
+        case 0: _t->on_btnExit_clicked(); break;
+        case 1: _t->on_btnCloseAll_clicked(); break;
+        case 2: _t->slot_btnImage_clicked(); break;
+        case 3: _t->on_chkSyncWindows_stateChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 4: _t->wheelEventInImageWindow((*reinterpret_cast< QWheelEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 5: _t->mousePressEventInImageWindow((*reinterpret_cast< QMouseEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 6: _t->mouseMoveEventInImageWindow((*reinterpret_cast< QMouseEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 7: _t->mouseReleaseEventInImageWindow((*reinterpret_cast< QMouseEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 8: _t->keyPressedInImageWindow((*reinterpret_cast< QKeyEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 9: _t->keyReleasedInImageWindow((*reinterpret_cast< QKeyEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 10: { int _r = _t->exec();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 10: _t->imageWindowDeletedAFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 11: _t->imageWindowDeletedAFile((*reinterpret_cast< QString(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -162,13 +166,13 @@ int MainDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 12)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 11;
+        _id -= 12;
     }
     return _id;
 }

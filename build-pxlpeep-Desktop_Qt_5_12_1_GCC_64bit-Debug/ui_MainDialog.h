@@ -35,21 +35,22 @@ public:
     QPushButton *btnImage7;
     QPushButton *btnImage8;
     QPushButton *btnImage9;
-    QPushButton *btnClose;
+    QPushButton *btnExit;
     QCheckBox *chkSyncWindows;
+    QPushButton *btnCloseAll;
 
     void setupUi(QDialog *MainDialog)
     {
         if (MainDialog->objectName().isEmpty())
             MainDialog->setObjectName(QString::fromUtf8("MainDialog"));
-        MainDialog->resize(780, 400);
+        MainDialog->resize(780, 600);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(MainDialog->sizePolicy().hasHeightForWidth());
         MainDialog->setSizePolicy(sizePolicy);
         MainDialog->setMinimumSize(QSize(780, 400));
-        MainDialog->setMaximumSize(QSize(780, 400));
+        MainDialog->setMaximumSize(QSize(780, 600));
         MainDialog->setContextMenuPolicy(Qt::PreventContextMenu);
         QIcon icon;
         icon.addFile(QString::fromUtf8("loupe.ico"), QSize(), QIcon::Normal, QIcon::Off);
@@ -115,12 +116,15 @@ public:
 
         verticalLayout->addWidget(btnImage9);
 
-        btnClose = new QPushButton(MainDialog);
-        btnClose->setObjectName(QString::fromUtf8("btnClose"));
-        btnClose->setGeometry(QRect(660, 250, 111, 31));
+        btnExit = new QPushButton(MainDialog);
+        btnExit->setObjectName(QString::fromUtf8("btnExit"));
+        btnExit->setGeometry(QRect(660, 380, 111, 31));
         chkSyncWindows = new QCheckBox(MainDialog);
         chkSyncWindows->setObjectName(QString::fromUtf8("chkSyncWindows"));
-        chkSyncWindows->setGeometry(QRect(10, 260, 191, 17));
+        chkSyncWindows->setGeometry(QRect(10, 390, 301, 17));
+        btnCloseAll = new QPushButton(MainDialog);
+        btnCloseAll->setObjectName(QString::fromUtf8("btnCloseAll"));
+        btnCloseAll->setGeometry(QRect(540, 380, 111, 31));
 
         retranslateUi(MainDialog);
 
@@ -140,8 +144,9 @@ public:
         btnImage7->setText(QApplication::translate("MainDialog", "Open image...", nullptr));
         btnImage8->setText(QApplication::translate("MainDialog", "Open image...", nullptr));
         btnImage9->setText(QApplication::translate("MainDialog", "Open image...", nullptr));
-        btnClose->setText(QApplication::translate("MainDialog", "Exit", nullptr));
+        btnExit->setText(QApplication::translate("MainDialog", "Exit", nullptr));
         chkSyncWindows->setText(QApplication::translate("MainDialog", "Synchronize windows", nullptr));
+        btnCloseAll->setText(QApplication::translate("MainDialog", "Close all", nullptr));
     } // retranslateUi
 
 };
