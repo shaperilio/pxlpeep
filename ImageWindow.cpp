@@ -1347,6 +1347,14 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                 zoomFit();
             break;
         }
+        case Qt::Key_M:
+        {
+            if (mods == Qt::NoModifier && !forwarded) {
+                if (parent != nullptr) {
+                    parent->raise();
+                }
+            }
+        }
         case Qt::Key_1:
         {
             if (mods == Qt::ControlModifier)
@@ -1670,6 +1678,7 @@ void ImageWindow::drawHelp()
     menu.append("CTRL+SHIFT+lt arrow         1/4-size top left\n"); numLines++;
     menu.append("ALT+SHIFT+lt arrow       1/4-size bottom left\n"); numLines++;
     menu.append("CTRL+dn arrow               1/4-size centered\n"); numLines++;
+    menu.append("M                           raise main window\n"); numLines++;
     menu.append("\n"); numLines++;
     menu.append("CTRL+C                copy image to clibpoard\n"); numLines++;
     menu.append("CTRL+SHIFT+C     copy screenshot to clibpoard\n"); numLines++;
