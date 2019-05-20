@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>780</width>
-    <height>400</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,7 @@
   <property name="maximumSize">
    <size>
     <width>780</width>
-    <height>400</height>
+    <height>600</height>
    </size>
   </property>
   <property name="contextMenuPolicy">
@@ -129,11 +129,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="QPushButton" name="btnClose">
+  <widget class="QPushButton" name="btnExit">
    <property name="geometry">
     <rect>
      <x>660</x>
-     <y>250</y>
+     <y>380</y>
      <width>111</width>
      <height>31</height>
     </rect>
@@ -146,13 +146,26 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>260</y>
-     <width>191</width>
+     <y>390</y>
+     <width>301</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
     <string>Synchronize windows</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnCloseAll">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>380</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Close all</string>
    </property>
   </widget>
  </widget>

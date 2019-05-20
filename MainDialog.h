@@ -21,7 +21,8 @@ public:
     QStringList filesToOpenAtStartup;
 
 private slots:
-    void on_btnClose_clicked();
+    void on_btnExit_clicked();
+    void on_btnCloseAll_clicked();
     void slot_btnImage_clicked();
 
     void on_chkSyncWindows_stateChanged(int arg1);

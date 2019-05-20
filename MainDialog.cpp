@@ -48,16 +48,21 @@ MainDialog::MainDialog(QWidget *parent) :
 
 MainDialog::~MainDialog()
 {
-    for (int i = 0; i < MAX_BUTTONS; i++)
-        if (imgWindows[i])
-            imgWindows[i]->close();
+    this->on_btnCloseAll_clicked();
 
     delete ui;
 }
 
-void MainDialog::on_btnClose_clicked()
+void MainDialog::on_btnExit_clicked()
 {
     this->close();
+}
+
+void MainDialog::on_btnCloseAll_clicked()
+{
+    for (int i = 0; i < MAX_BUTTONS; i++)
+        if (imgWindows[i])
+            imgWindows[i]->close();
 }
 
 // Don't start this with "on_" because we connect them manually in the constructor, and

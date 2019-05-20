@@ -37,7 +37,8 @@ public:
     QPushButton *btnImage7;
     QPushButton *btnImage8;
     QPushButton *btnImage9;
-    QPushButton *btnClose;
+    QPushButton *btnExit;
+    QPushButton *btnCloseAll;
     QCheckBox *chkSyncWindows;
 
     void setupUi(QDialog *MainDialog)
@@ -117,9 +118,14 @@ public:
 
         verticalLayout->addWidget(btnImage9);
 
-        btnClose = new QPushButton(MainDialog);
-        btnClose->setObjectName(QStringLiteral("btnClose"));
-        btnClose->setGeometry(QRect(660, 360, 111, 31));
+        btnExit = new QPushButton(MainDialog);
+        btnExit->setObjectName(QStringLiteral("btnExit"));
+        btnExit->setGeometry(QRect(660, 360, 111, 31));
+
+        btnCloseAll = new QPushButton(MainDialog);
+        btnCloseAll->setObjectName(QStringLiteral("btnCloseAll"));
+        btnCloseAll->setGeometry(QRect(500, 360, 150, 31));
+
         chkSyncWindows = new QCheckBox(MainDialog);
         chkSyncWindows->setObjectName(QStringLiteral("chkSyncWindows"));
         chkSyncWindows->setGeometry(QRect(10, 365, 300, 27));
@@ -142,7 +148,8 @@ public:
         btnImage7->setText(QApplication::translate("MainDialog", "Open image...", 0));
         btnImage8->setText(QApplication::translate("MainDialog", "Open image...", 0));
         btnImage9->setText(QApplication::translate("MainDialog", "Open image...", 0));
-        btnClose->setText(QApplication::translate("MainDialog", "Exit", 0));
+        btnExit->setText(QApplication::translate("MainDialog", "Exit", 0));
+        btnCloseAll->setText(QApplication::translate("MainDialog", "Close all", 0));
         chkSyncWindows->setText(QApplication::translate("MainDialog", "Synchronize windows", 0));
     } // retranslateUi
 
