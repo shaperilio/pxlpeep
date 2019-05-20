@@ -79,8 +79,10 @@ void MainDialog::slot_btnImage_clicked()
 
     if (imgWindows[i] == nullptr)
         openAndShow(-1, ""); // Open a new window.
-    else
+    else {
         imgWindows[i]->raise(); // Bring it up.
+        imgWindows[i]->activateWindow(); // and make it live.
+    }
 }
 
 void MainDialog::on_chkSyncWindows_stateChanged(int arg1)
