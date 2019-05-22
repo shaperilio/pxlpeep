@@ -56,7 +56,7 @@ protected:
     QString  retrieveLastOpenFrom();
 
     const QString KEY_LAST_FILE_TYPE = "last_file_type";
-    void     storeLastFileType(int lastTypeIndex);
+    void     storeLastFileType(QString lastType);
     QString retrieveLastFileType();
 
     void openAndShow(int windowID, QString filename);

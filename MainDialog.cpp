@@ -184,6 +184,7 @@ void MainDialog::connectSignals(int ID)
 void MainDialog::resetButton(int ID)
 {
     imgButtons[ID]->setText("Open image...");
+    imgButtons[ID]->setToolTip("");
 }
 
 void MainDialog::imageWindowClosing(int ID)
@@ -208,11 +209,11 @@ QString MainDialog::retrieveLastOpenFrom()
     return s.value(key).toString();
 }
 
-void MainDialog::storeLastFileType(int lastTypeIndex)
+void MainDialog::storeLastFileType(QString lastType)
 {
     QSettings s;
     const QString key(KEY_LAST_FILE_TYPE);
-    s.setValue(key, lastTypeIndex);
+    s.setValue(key, lastType);
 }
 
 QString MainDialog::retrieveLastFileType()
@@ -255,13 +256,14 @@ void MainDialog::openAndShow(int windowID, QString filename)
     bool imgResult = false;
     imgResult = imgWindow->readImage(filename);
 
+    QString lastFileType = retrieveLastFileType();
+    QString lastFileLocation = retrieveLastOpenFrom();
     while(!imgResult)
     {
-        QString lastFileType = retrieveLastFileType();
         filename = QFileDialog::getOpenFileName(
                     this,
                     "Open image",
-                    retrieveLastOpenFrom(),
+                    lastFileLocation,
                     "All files (*.*);;JPEG (*.jpg *.jpeg);;TIFF (*.tif *.tiff);;PNG (*.png);;BMP (*.bmp);;Photoshop (*.PSD)", //filter
                     &lastFileType,
                     nullptr //options
@@ -279,15 +281,17 @@ void MainDialog::openAndShow(int windowID, QString filename)
         if (!imgResult)
             cerr << "Failed to open image " << filename.toStdString() << endl;
     }
+    storeLastOpenFrom(filename);
+    storeLastFileType(lastFileType);
     imgWindow->holdAll();
     imgWindow->setColormap(ColormapPalette::Grey);
     imgWindow->setImageFunction(ImageWindowFunction::OneToOne);
     imgWindow->setWindowTitle(filename);
     imgButtons[ID]->setText(filename);
+    imgButtons[ID]->setToolTip(filename);
     imgResult = imgWindow->releaseAll(); // Release before you zoom fit, or the image won't be centered.
     imgWindow->zoomFit();
     imgWindow->showWindow();
-
 }
 
 void MainDialog::keyPressEvent(QKeyEvent *e)
