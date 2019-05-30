@@ -8,6 +8,7 @@
 #include <QDesktopWidget>
 #include <QDir>
 #include <iostream>
+#include <QCollator>
 
 using namespace std;
 
@@ -1726,16 +1727,21 @@ void ImageWindow::syncWithFolder()
 {
     if (curFilename == "") return;
 
-    //This is guaranteed to work once we've loaded an image.
+    // This is guaranteed to work once we've loaded an image.
     QStringList chunks = curFilename.split(".");
     QString extension = chunks[chunks.count() - 1];
 
     QDir dir(curDirectory);
     dir.setFilter(QDir::Files);
-    dir.setSorting(QDir::Name);
+    dir.setSorting(QDir::NoSort);
     dir.setNameFilters(QStringList() << ("*." + extension));
 
+    // How to sort numbers correctly:
+    // https://stackoverflow.com/a/36018397/149506
     fileList = dir.entryList();
+    QCollator collator;
+    collator.setNumericMode(true);
+    std::sort(fileList.begin(), fileList.end(), collator);
 
     fileListPos = -1;
 
