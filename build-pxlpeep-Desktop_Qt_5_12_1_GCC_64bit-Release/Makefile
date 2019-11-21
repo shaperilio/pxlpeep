@@ -858,7 +858,7 @@ moc_ImageWindow.cpp: ../ImageWindow.h \
 		../../Qt/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		moc_predefs.h \
 		../../Qt/5.12.1/gcc_64/bin/moc
-	/home/shaperilio/Qt/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/shaperilio/pxlpeep/build-pxlpeep-Desktop_Qt_5_12_1_GCC_64bit-Release/moc_predefs.h -I/home/shaperilio/Qt/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/shaperilio/pxlpeep -I/home/FreeImageDLL/Dist/x32 -I/home/shaperilio/Qt/5.12.1/gcc_64/include -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtOpenGL -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtWidgets -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtGui -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../ImageWindow.h -o moc_ImageWindow.cpp
+	/home/shaperilio/Qt/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/shaperilio/pxlpeep/build-pxlpeep-Desktop_Qt_5_12_1_GCC_64bit-Release/moc_predefs.h -I/home/shaperilio/Qt/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/shaperilio/pxlpeep -I/home/FreeImageDLL/Dist/x32 -I/home/shaperilio/Qt/5.12.1/gcc_64/include -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtOpenGL -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtWidgets -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtGui -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../ImageWindow.h -o moc_ImageWindow.cpp
 
 moc_MainDialog.cpp: ../MainDialog.h \
 		../../Qt/5.12.1/gcc_64/include/QtWidgets/QDialog \
@@ -969,7 +969,7 @@ moc_MainDialog.cpp: ../MainDialog.h \
 		../../Qt/5.12.1/gcc_64/include/QtCore/QString \
 		moc_predefs.h \
 		../../Qt/5.12.1/gcc_64/bin/moc
-	/home/shaperilio/Qt/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/shaperilio/pxlpeep/build-pxlpeep-Desktop_Qt_5_12_1_GCC_64bit-Release/moc_predefs.h -I/home/shaperilio/Qt/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/shaperilio/pxlpeep -I/home/FreeImageDLL/Dist/x32 -I/home/shaperilio/Qt/5.12.1/gcc_64/include -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtOpenGL -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtWidgets -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtGui -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../MainDialog.h -o moc_MainDialog.cpp
+	/home/shaperilio/Qt/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/shaperilio/pxlpeep/build-pxlpeep-Desktop_Qt_5_12_1_GCC_64bit-Release/moc_predefs.h -I/home/shaperilio/Qt/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/shaperilio/pxlpeep -I/home/FreeImageDLL/Dist/x32 -I/home/shaperilio/Qt/5.12.1/gcc_64/include -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtOpenGL -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtWidgets -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtGui -I/home/shaperilio/Qt/5.12.1/gcc_64/include/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../MainDialog.h -o moc_MainDialog.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1244,6 +1244,8 @@ ImageWindow.o: ../ImageWindow.cpp ../definitions.h \
 		../../Qt/5.12.1/gcc_64/include/QtCore/QDir \
 		../../Qt/5.12.1/gcc_64/include/QtCore/qdir.h \
 		../../Qt/5.12.1/gcc_64/include/QtCore/qfileinfo.h \
+		../../Qt/5.12.1/gcc_64/include/QtCore/QCollator \
+		../../Qt/5.12.1/gcc_64/include/QtCore/qcollator.h \
 		../../Qt/5.12.1/gcc_64/include/QtWidgets/QApplication \
 		../../Qt/5.12.1/gcc_64/include/QtWidgets/qapplication.h \
 		../../Qt/5.12.1/gcc_64/include/QtCore/qcoreapplication.h \
@@ -1565,6 +1567,8 @@ MainDialog.o: ../MainDialog.cpp ../MainDialog.h \
 		../../Qt/5.12.1/gcc_64/include/QtCore/QSettings \
 		../../Qt/5.12.1/gcc_64/include/QtCore/qsettings.h \
 		../definitions.h \
+		../../Qt/5.12.1/gcc_64/include/QtCore/QMimeData \
+		../../Qt/5.12.1/gcc_64/include/QtCore/qmimedata.h \
 		../../Qt/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
 		../../Qt/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainDialog.o ../MainDialog.cpp

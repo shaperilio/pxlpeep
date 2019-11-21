@@ -1355,6 +1355,7 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                     parent->raise();
                 }
             }
+            break;
         }
         case Qt::Key_1:
         {
@@ -1745,15 +1746,18 @@ void ImageWindow::syncWithFolder()
 
     fileListPos = -1;
 
+    cout << "syncWithFolder";
     for (int i = 0; i < fileList.length(); i++)
     {
         QString listFilename = curDirectory + fileList.at(i);
         if (curFilename == listFilename)
         {
             fileListPos = i;
-            break;
+            cout << " found " << curFilename.toStdString() << " at position " << fileListPos << endl;
+            return;
         }
     }
+    cout << " could not find " << curFilename.toStdString() << endl;
 }
 
 bool ImageWindow::readNextImage()
