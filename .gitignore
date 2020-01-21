@@ -25,3 +25,6 @@
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Remove binaries, since they don't work anyway
+build-*
