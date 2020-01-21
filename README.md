@@ -19,7 +19,12 @@ Builds out of the box in QtCreator on Ubuntu; presumably builds on a Mac, but I'
 ## Dependencies
 Requires FreeImage, which can be installed on Ubuntu with 
 ```
-sudo apt-get install libfreeimage-dev
+sudo apt install libfreeimage-dev
+```
+
+It also requires OpenGL, which Qt seems to include but somehow not link correctly so then `ld` can't find it. You can brute-force rectify this with
+```
+sudo apt install freeglut3-dev
 ```
 
 ## Use
