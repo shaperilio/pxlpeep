@@ -30,4 +30,5 @@ Temporary Items
 build-*
 
 # Desktop files can't have relative paths so everyone will have to make their own.
+# git update-index --no-assume-unchanged pxlpeep.desktop to start tracking again
 pxlpeep.desktop
