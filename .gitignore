@@ -28,3 +28,6 @@ Temporary Items
 
 # Remove binaries, since they don't work anyway
 build-*
+
+# Desktop files can't have relative paths so everyone will have to make their own.
+pxlpeep.desktop
