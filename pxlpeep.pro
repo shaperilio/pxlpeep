@@ -34,14 +34,23 @@ RESOURCES += \
 #http://stackoverflow.com/a/14999452/149506
 CONFIG(debug, release|debug):DEFINES += _DEBUG
 
-#http://stackoverflow.com/a/2228397 and http://stackoverflow.com/a/16950073
-QMAKE_CXXFLAGS += -fopenmp
-QMAKE_CXXFLAGS += -std=c++0x
+# For linux:
+unix:!macx {
+    QMAKE_CXXFLAGS += -fopenmp
+    QMAKE_CXXFLAGS += -std=c++
+    LIBS += -fopenmp -lfreeimage
+}
 
-LIBS += -fopenmp
-unix: LIBS+= -lfreeimage
+# For Catalina:
+macx {
+    QMAKE_CXXFLAGS += -Xpreprocessor -fopenmp
+    INCLUDEPATH += /usr/local/opt/freeimage/include
+    INCLUDEPATH += /usr/local/opt/libomp/include
+    LIBS += -L/usr/local/lib/ -lfreeimage -lomp
+}
 
-win32: LIBS += -L$$PWD/../../FreeImageDLL/Dist/x32/ -lFreeImage
-
-INCLUDEPATH += $$PWD/../../FreeImageDLL/Dist/x32
-DEPENDPATH += $$PWD/../../FreeImageDLL/Dist/x32
+win32 {
+    LIBS += -L$$PWD/../../FreeImageDLL/Dist/x32/ -lFreeImage
+    INCLUDEPATH += $$PWD/../../FreeImageDLL/Dist/x32
+    DEPENDPATH += $$PWD/../../FreeImageDLL/Dist/x32
+}

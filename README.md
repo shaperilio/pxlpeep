@@ -22,9 +22,22 @@ Requires FreeImage, which can be installed on Ubuntu with
 sudo apt install libfreeimage-dev
 ```
 
-It also requires OpenGL, which Qt seems to include but somehow not link correctly so then `ld` can't find it. You can brute-force rectify this with
+On a mac:
+```
+brew install freeimage
+```
+
+It also requires OpenGL, which Qt seems to include but somehow not link correctly in Ubuntu so then `ld` can't find it. You can brute-force rectify this with
+
 ```
 sudo apt install freeglut3-dev
+```
+
+## Building MacOS Catalina
+You have to install OpenMP.
+
+```
+brew install libomp
 ```
 
 ## Use

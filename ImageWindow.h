@@ -163,7 +163,7 @@ protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     int zoomLevel;
     double zoomFactor;
-    static constexpr double zoomStep = sqrt(2.0);
+    static constexpr double zoomStep = 1.41421356237;//sqrt(2.0);
     static const int maxZoomLevel = 16;
     static const int minZoomLevel = -16;
     static const int deltaThresh = 360; //mouse wheel will zoom in/out once delta exceeds this.
