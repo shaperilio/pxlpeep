@@ -37,7 +37,6 @@ CONFIG(debug, release|debug):DEFINES += _DEBUG
 # For linux:
 unix:!macx {
     QMAKE_CXXFLAGS += -fopenmp
-#    QMAKE_CXXFLAGS += -std=c++
     LIBS += -fopenmp -lfreeimage
 }
 
