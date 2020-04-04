@@ -1338,7 +1338,11 @@ void ImageWindow::saveScreenshotToFile()
 
 void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
 {
-    Qt::KeyboardModifiers mods = QApplication::queryKeyboardModifiers();
+    Qt::KeyboardModifiers mods = QApplication::keyboardModifiers();
+
+    cout << std::hex;
+    cout << "Key press: 0x" << event->key() << " with modifier 0x" << mods << endl;
+    cout << std::dec;
 
     switch(event->key())
     {
@@ -1367,28 +1371,31 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         {
             if (!forwarded)
             {
-                if (mods == Qt::ControlModifier)
+                if (mods == Qt::ControlModifier ||
+                    mods == (Qt::ControlModifier | Qt::KeypadModifier))
                 {
                     snapWindowTo(Left, -1);
                     break;
                 }
-                if (mods == (Qt::ControlModifier | Qt::ShiftModifier))
+                if (mods == (Qt::ControlModifier | Qt::ShiftModifier) ||
+                    mods == (Qt::ControlModifier | Qt::ShiftModifier | Qt::KeypadModifier))
                 {
                     snapWindowTo(TopLeft, -1);
                     break;
                 }
-                if (mods == (Qt::AltModifier     | Qt::ShiftModifier))
+                if (mods == (Qt::AltModifier     | Qt::ShiftModifier) ||
+                    mods == (Qt::ControlModifier | Qt::KeypadModifier | Qt::KeypadModifier))
                 {
                     snapWindowTo(BottomLeft, -1);
                     break;
                 }
-                if (mods == Qt::NoModifier)
+                if (mods == Qt::NoModifier || Qt::KeypadModifier)
                 {
                     readPrevImage();
                     break;
                 }
             }
-            if (mods == Qt::NoModifier)
+            if (mods == Qt::NoModifier || mods == Qt::KeypadModifier)
                 readPrevImage();
             break;
         }
@@ -1396,41 +1403,46 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         {
             if (!forwarded)
             {
-                if (mods == Qt::ControlModifier)
+                if (mods == Qt::ControlModifier ||
+                    mods == (Qt::ControlModifier | Qt::KeypadModifier))
                 {
                     snapWindowTo(Right, -1);
                     break;
                 }
-                if (mods == (Qt::ControlModifier | Qt::ShiftModifier))
+                if (mods == (Qt::ControlModifier | Qt::ShiftModifier) ||
+                    mods == (Qt::ControlModifier | Qt::KeypadModifier | Qt::KeypadModifier))
                 {
                     snapWindowTo(TopRight, -1);
                     break;
                 }
-                if (mods == (Qt::AltModifier     | Qt::ShiftModifier))
+                if (mods == (Qt::AltModifier     | Qt::ShiftModifier) ||
+                    mods == (Qt::ControlModifier | Qt::KeypadModifier | Qt::KeypadModifier))
                 {
                     snapWindowTo(BottomRight, -1);
                     break;
                 }
-                if (mods == Qt::NoModifier)
+                if (mods == Qt::NoModifier || mods == Qt::KeypadModifier)
                 {
                     readNextImage();
                     break;
                 }
             }
-            if (mods == Qt::NoModifier)
+            if (mods == Qt::NoModifier || mods == Qt::KeypadModifier)
                 readNextImage();
             break;
         }
         case Qt::Key_Up:
         {
-            if (mods == Qt::ControlModifier && !forwarded)
-                snapWindowTo(Max, -1);
+            if (!forwarded)
+                if (mods == Qt::ControlModifier || mods == (Qt::ControlModifier | Qt::KeypadModifier))
+                    snapWindowTo(Max, -1);
             break;
         }
         case Qt::Key_Down:
         {
-            if (mods == Qt::ControlModifier && !forwarded)
-                snapWindowTo(Restore, -1);
+            if (!forwarded)
+                if (mods == Qt::ControlModifier || mods == (Qt::ControlModifier | Qt::KeypadModifier))
+                    snapWindowTo(Restore, -1);
             break;
         }
         case Qt::Key_F5:
