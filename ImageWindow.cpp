@@ -38,10 +38,15 @@ ImageWindow::ImageWindow(Colormapper &map, int ID)
     int id = QFontDatabase::addApplicationFont(":/fonts/ProFontWindows.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     windowFont = QFont(family);
-    windowFont.setPixelSize(18);
-
-    setWindowFlags(Qt::CustomizeWindowHint);//sizeable border without title bar.
-
+    windowFont.setPixelSize(12);
+#ifdef Q_OS_MACOS
+    // If we do a titleless window on Mac, you can't resize the window.
+    // Tool windows have a smaller titlebar but they are always on top of the main window.
+//    setWindowFlags(Qt::Tool);
+//    setAttribute(Qt::WA_MacAlwaysShowToolWindow); // so it doesn't disappear when we lose focus.
+#else
+    setWindowFlags(Qt::CustomizeWindowHint); //sizeable border without title bar.
+#endif
     //The update mode is important because we will draw on top of the image things that
     //we don't want to scroll with the image (color bar, info box, etc.).
     //If you don't set this, you can get smearing of our hand-drawn items in the image.
@@ -892,7 +897,7 @@ void ImageWindow::drawColorbar()
     int barWidth = 255;
     while (fm.width(title) + fm.width(minTxt) + fm.width(maxTxt) + 50 > barWidth)
         barWidth += 256;
-    int barHeight = 20;
+    int barHeight = 10;
 
     QRect colorbarRect(0, 0, barWidth + 2 * boxMargin, barHeight + textH + 5 + 2 * boxMargin);
 
