@@ -63,8 +63,9 @@ public:
     bool imgYOriginIsBottom; //default is false; image origin is top left corner.
     bool imgIsZeroIndexed;   //default is true; first pixel is pixel zero.
 
-    bool setSourceImage(ImageData *image) {sourceImage = image; return translateImage();}
-    ImageData * getSourceImage() {return sourceImage;}
+    // These are not in use.
+//    bool setSourceImage(ImageData *image) {sourceImage = image; return translateImage();}
+//    ImageData * getSourceImage() {return sourceImage;}
 
     double getUserMin() {return userMin;}
     double getUserMax() {return userMax;}
@@ -128,7 +129,13 @@ protected:
     QImage translatedImage;   //need an image to access pixels directly, but...
     QPixmap translatedPixmap; //...need a pixmap for display.
 
-    ImageData *sourceImage;
+    static constexpr int IMAGE_BUFFER_LENGTH = 10;
+    ImageData *sourceImageBuffer[IMAGE_BUFFER_LENGTH];
+    QString sourceImageBufferFilenames[IMAGE_BUFFER_LENGTH];
+    int sourceImageBufferIndex = 0;  // Stores the next available slot in the buffer.
+    int currentImageBufferIndex = 0; // Stores the slot that we're currently looking at.
+    void reportBufferContents();
+
     QGraphicsScene *scene;
     Colormapper *colormap;
 

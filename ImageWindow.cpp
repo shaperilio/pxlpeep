@@ -12,6 +12,8 @@
 
 using namespace std;
 
+#define NOT_LOADED "not loaded"
+
 ImageWindow::ImageWindow(Colormapper &map, int ID)
 {
     this->ID = ID;
@@ -58,7 +60,10 @@ ImageWindow::ImageWindow(Colormapper &map, int ID)
 
     setCursor(Qt::CrossCursor);
 
-    sourceImage = nullptr;
+    for (int i = 0; i < IMAGE_BUFFER_LENGTH; i++) {
+        sourceImageBuffer[i] = nullptr;
+        sourceImageBufferFilenames[i] = NOT_LOADED;
+    }
     scene = nullptr;
     colormap = &map;
  }
@@ -72,23 +77,74 @@ void ImageWindow::closeEvent(QCloseEvent *event)
 {
     if (parent != nullptr) parent->imageWindowClosing(ID);
     if (scene != nullptr) delete scene;
-    if (sourceImage != nullptr) delete sourceImage;
+    for (int i = 0; i < IMAGE_BUFFER_LENGTH; i++)
+        if (sourceImageBuffer[i] != nullptr) delete sourceImageBuffer[i];
     event->accept();
+}
+
+void ImageWindow::reportBufferContents()
+{
+    for (int i = 0; i < IMAGE_BUFFER_LENGTH; i++) {
+        if (sourceImageBufferFilenames[i] == NOT_LOADED) continue;
+        cout << "Image buffer slot " << i << ": " << sourceImageBufferFilenames[i].toStdString() << endl;
+    }
 }
 
 bool ImageWindow::readImage(QString filename)
 {
+    cout << endl;
+    if (filename == "")
+        return false;
+
+    QFileInfo fileInfo(filename);
+    filename = fileInfo.canonicalFilePath();
+
+    reportBufferContents();
+
+    int idx = -1;
+    for (int i = 0; i < IMAGE_BUFFER_LENGTH; i++) {
+        if (filename == sourceImageBufferFilenames[i]) {
+            idx = i;
+            break;
+        }
+    }
+
+    if (idx == -1) {
+        // This image is not in our buffer. Find a slot for it.
+        sourceImageBufferIndex = (sourceImageBufferIndex + 1) % IMAGE_BUFFER_LENGTH;
+        if (sourceImageBuffer[sourceImageBufferIndex] != nullptr) {
+            delete sourceImageBuffer[sourceImageBufferIndex];
+            sourceImageBuffer[sourceImageBufferIndex] = nullptr;
+            sourceImageBufferFilenames[sourceImageBufferIndex] = NOT_LOADED;
+        }
+        cout << "Image `" << filename.toStdString() << "` not buffered; loading from disk." << endl;
+        currentImageBufferIndex = sourceImageBufferIndex;
+    } else {
+        // This image is in our buffer; we're done!
+        currentImageBufferIndex = idx;
+        cout << "Image `" << filename.toStdString() << "` found at buffer position " << idx << "." << endl;
+        curFilename = filename;
+        sourceImageBufferFilenames[currentImageBufferIndex] = curFilename;
+
+        int lastSlash = curFilename.lastIndexOf('/');
+        curDirectory = curFilename.left(lastSlash + 1);
+        return translateImage();
+    }
+
     curFilename = "";
 
-    if(sourceImage == nullptr)
-        sourceImage = new ImageData;
+    cout << "Using buffer slot " << currentImageBufferIndex << endl;
+    auto sourceImage = &(sourceImageBuffer[currentImageBufferIndex]);
 
-    sourceImage->painter = this;
-    bool r = sourceImage->readImage(filename);
+    if((*sourceImage) == nullptr)
+        (*sourceImage) = new ImageData();
+
+    (*sourceImage)->painter = this;
+    bool r = (*sourceImage)->readImage(filename);
     if (!r)
     {
-        delete sourceImage;
-        sourceImage = nullptr;
+        delete (*sourceImage);
+        (*sourceImage) = nullptr;
         return r;
     }
 
@@ -96,11 +152,12 @@ bool ImageWindow::readImage(QString filename)
     setScene(scene);
 
     curFilename = filename;
+    sourceImageBufferFilenames[currentImageBufferIndex] = curFilename;
 
-    QFileInfo f(curFilename);
-    curFilename = f.canonicalFilePath();
     int lastSlash = curFilename.lastIndexOf('/');
     curDirectory = curFilename.left(lastSlash + 1);
+
+    reportBufferContents();
 
     return translateImage();
 }
@@ -159,6 +216,7 @@ bool ImageWindow::setImageRotation(ImageWindowRotation newRotation)
 
 int ImageWindow::getImageWidth()
 {
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
     if (sourceImage == nullptr)
         return 0;
     if (rotation == ImageWindowRotation::Zero || rotation == ImageWindowRotation::CCW180)
@@ -169,6 +227,7 @@ int ImageWindow::getImageWidth()
 
 int ImageWindow::getImageHeight()
 {
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
     if (sourceImage == nullptr)
         return 0;
     if (rotation == ImageWindowRotation::Zero || rotation == ImageWindowRotation::CCW180)
@@ -197,6 +256,7 @@ bool ImageWindow::getTranslationParamsString(QString &params)
     params += temp.sprintf("f%d_", function);
     params += temp.sprintf("m%d_", getColormap());
     params += temp.sprintf("r%d", rotation);
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
     if (sourceImage->getNumChannels() == 1)
         return true;
 
@@ -234,9 +294,9 @@ bool ImageWindow::translateImage()
 
     maxDisp = colormap->getMaxPaletteValue();
 
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
     double maxVal = sourceImage->getMaxValue();
     double minVal = sourceImage->getMinValue();
-
     switch(scaling)
     {
     case ImageWindowScaling::Centered:
@@ -376,6 +436,7 @@ void ImageWindow::checkROIpoint(QPoint &point)
         point.setX(0);
     if(point.y() < 0)
         point.setY(0);
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
     if(point.x() > sourceImage->getWidth())
         point.setX(sourceImage->getWidth());
     if(point.y() > sourceImage->getHeight())
@@ -603,6 +664,7 @@ void ImageWindow::drawInfoBox()
     QString line1 = curFilename;
 
     //Width, height, zoom, and rotation
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
     QString line2;
     line2.sprintf("W = %d, H = %d pix (%.2fX)",
                   sourceImage->getWidth(), sourceImage->getHeight(), zoomFactor);
@@ -1348,6 +1410,8 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
     cout << std::hex;
     cout << "Key press: 0x" << event->key() << " with modifier 0x" << mods << endl;
     cout << std::dec;
+
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
 
     switch(event->key())
     {
