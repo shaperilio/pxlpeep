@@ -128,6 +128,8 @@ bool ImageWindow::readImage(QString filename)
 
         int lastSlash = curFilename.lastIndexOf('/');
         curDirectory = curFilename.left(lastSlash + 1);
+        syncWithFolder();
+        setWindowTitle(filename);
         return translateImage();
     }
 
@@ -156,6 +158,8 @@ bool ImageWindow::readImage(QString filename)
 
     int lastSlash = curFilename.lastIndexOf('/');
     curDirectory = curFilename.left(lastSlash + 1);
+    syncWithFolder();
+    setWindowTitle(filename);
 
     reportBufferContents();
 
@@ -1835,26 +1839,52 @@ void ImageWindow::syncWithFolder()
         {
             fileListPos = i;
             cout << " found " << curFilename.toStdString() << " at position " << fileListPos << endl;
+
+            // Now store the filenames for the next and previous images.
+            int idx;
+
+            idx = fileListPos;
+            if (idx == fileList.length() - 1)
+                idx = 0;
+            else
+                idx++;
+            nextFile = fileList.at(idx);
+
+            idx = fileListPos;
+            if (idx == 0)
+                idx = fileList.length() - 1;
+            else
+                idx--;
+
+            prevFile = fileList.at(idx);
+            cout << " --> " << nextFile.toStdString() << endl;
+            cout << " <-- " << prevFile.toStdString() << endl;
+
             return;
         }
     }
     cout << " could not find " << curFilename.toStdString() << endl;
+    cout << " --> " << nextFile.toStdString() << endl;
+    cout << " <-- " << prevFile.toStdString() << endl;
+    // The current image being viewed has been deleted.
+    // leave previous / next as it was in readImage
+    // This will still leave a bad prevoius/next if both the current image
+    // and previous or next were deleted.
+    // TODO: move the open file dialog logic from MainDialog.cpp into this class,
+    // so when we fail to open a file, show the dialog.
+    // (should also enable a hotkey for opening files).
 }
 
 bool ImageWindow::readNextImage()
 {
     syncWithFolder(); // to make sure we update the folder just before we attempt to go to the next image.
+    // TODO: remove these list length checks when we add the open file dialog box;
+    // at that point the user will be shown a dialog box and see what's there.
     if (fileList.length() == 0) return false;
     if (fileList.length() == 1) return true;
 
-    if (fileListPos == fileList.length() - 1)
-        fileListPos = 0;
-    else
-        fileListPos++;
-
-    QString nextFile = curDirectory + fileList.at(fileListPos);
-    bool result = readImage(nextFile);
-    syncWithFolder(); // to reset our location in the file list, in case we loaded the image correctly.
+    QString toRead = curDirectory + nextFile;
+    bool result = readImage(toRead);
     return result;
 }
 
@@ -1864,14 +1894,8 @@ bool ImageWindow::readPrevImage()
     if (fileList.length() == 0) return false;
     if (fileList.length() == 1) return true;
 
-    if (fileListPos == 0)
-        fileListPos = fileList.length() - 1;
-    else
-        fileListPos--;
-
-    QString nextFile = curDirectory + fileList.at(fileListPos);
-    bool result = readImage(nextFile);
-    syncWithFolder();
+    QString toRead = curDirectory + prevFile;
+    bool result = readImage(toRead);
     return result;
 }
 

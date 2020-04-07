@@ -227,6 +227,7 @@ protected:
     void snapWindowTo(snapType snap, int screenNum);
 
     QList<QString> fileList;
+    QString nextFile, prevFile;
     int fileListPos;
     bool deleteCurrentFile();
 
