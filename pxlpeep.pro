@@ -54,3 +54,13 @@ win32 {
     INCLUDEPATH += $$PWD/../../FreeImageDLL/Dist/x32
     DEPENDPATH += $$PWD/../../FreeImageDLL/Dist/x32
 }
+
+# Note. To debug this on Mac, you may have to do the following:
+# Thanks to this guy for saving me: https://stackoverflow.com/a/35070568/149506
+#
+# mv FILE.dylib FILE.dylib.old
+# ln -s /System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO/FILE.dylib /usr/local/lib/FILE.dylib
+#
+# and tab completion doesn't work for some reason? (hidden files?)
+# I had to do this for the following values of FILE:
+# libJPEG, libGIF, libTIFF, libPnG
