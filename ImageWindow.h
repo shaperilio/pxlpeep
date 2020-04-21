@@ -244,9 +244,10 @@ protected:
     void saveImageToFile();
     bool takeScreenshot(QImage &screenshot);
     void copyScreenshotToClipboard();
+    void pasteFromClipboard();
     void saveScreenshotToFile();
 
-
+    void setTitle(QString title);
 signals:
     // These are connected to slots in MainDialog for inter-window syncing.
     // When something happens in an ImageWindow, these signals notify the main window.

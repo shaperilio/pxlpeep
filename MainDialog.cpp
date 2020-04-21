@@ -287,11 +287,16 @@ void MainDialog::openAndShow(int windowID, QString filename)
     imgWindow->setColormap(ColormapPalette::Grey);
     imgWindow->setImageFunction(ImageWindowFunction::OneToOne);
     imgWindow->setWindowTitle(filename);
-    imgButtons[ID]->setText(filename);
-    imgButtons[ID]->setToolTip(filename);
+    this->setButtonText(ID, filename);
     imgResult = imgWindow->releaseAll(); // Release before you zoom fit, or the image won't be centered.
     imgWindow->zoomFit();
     imgWindow->showWindow();
+}
+
+void MainDialog::setButtonText(int ID, QString text)
+{
+    imgButtons[ID]->setText(text);
+    imgButtons[ID]->setToolTip(text);
 }
 
 void MainDialog::keyPressEvent(QKeyEvent *e)

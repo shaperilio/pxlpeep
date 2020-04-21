@@ -91,6 +91,12 @@ void ImageWindow::reportBufferContents()
     }
 }
 
+void ImageWindow::setTitle(QString title)
+{
+    setWindowTitle(title);
+    parent->setButtonText(myButtonNo, title);
+}
+
 bool ImageWindow::readImage(QString filename)
 {
     cout << endl;
@@ -130,7 +136,7 @@ bool ImageWindow::readImage(QString filename)
         int lastSlash = curFilename.lastIndexOf('/');
         curDirectory = curFilename.left(lastSlash + 1);
         syncWithFolder();
-        setWindowTitle(filename);
+        setTitle(filename);
         return translateImage();
     }
 
@@ -160,7 +166,7 @@ bool ImageWindow::readImage(QString filename)
     int lastSlash = curFilename.lastIndexOf('/');
     curDirectory = curFilename.left(lastSlash + 1);
     syncWithFolder();
-    setWindowTitle(filename);
+    setTitle(filename);
 
     reportBufferContents();
 
@@ -1451,6 +1457,25 @@ void ImageWindow::copyScreenshotToClipboard()
 }
 
 #include <QDateTime>
+void ImageWindow::pasteFromClipboard()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    if (clipboard == nullptr)
+    {
+        cerr << "Clibpard is null!" << endl;
+        return;
+    }
+    QImage cbImage = clipboard->image();
+    QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".tif";
+    if(cbImage.save(filename))
+    {
+        cout << "Saved clipboard image to " << filename.toStdString() << endl;
+        this->readImage(filename);
+    }
+    else
+        cerr << "Failed to save clipboard image to " << filename.toStdString() << endl;
+}
+
 void ImageWindow::saveScreenshotToFile()
 {
     QImage image;
@@ -1479,6 +1504,8 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
     switch(event->key())
     {
         case Qt::Key_Shift:
+        case Qt::Key_Control:
+        case Qt::Key_Alt:
             break;
         case Qt::Key_QuoteLeft:
         {
@@ -1639,6 +1666,12 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         }
         case Qt::Key_V:
         {
+            if (!forwarded && mods == Qt::ControlModifier)
+            {
+                pasteFromClipboard();
+                break;
+            }
+
             int map = (int)getColormap();
             if (mods == Qt::NoModifier)
                 map--;

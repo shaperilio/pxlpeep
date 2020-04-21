@@ -19,6 +19,7 @@ public:
     ~MainDialog() Q_DECL_OVERRIDE;
     void imageWindowClosing(int ID);
     QStringList filesToOpenAtStartup;
+    void setButtonText(int ID, QString text);
 
 private slots:
     void on_btnExit_clicked();
