@@ -66,6 +66,7 @@ ImageWindow::ImageWindow(Colormapper &map, int ID)
     }
     scene = nullptr;
     colormap = &map;
+    dipFactor = 1;
  }
 
 void ImageWindow::resetWheelAccumulator()
@@ -181,6 +182,15 @@ bool ImageWindow::setImageFunction(ImageWindowFunction newFunction)
 //    if (function == ImageWindowFunction::Log10 && getScaleMode() != ImageWindowScaling::Fit)
 //        return setScaleMode(ImageWindowScaling::Fit);
     return translateImage();
+}
+
+bool ImageWindow::setDipFactor(double dipFactor)
+{
+    this->dipFactor = dipFactor;
+    auto f = this->getImageFunction();
+    if (f == ImageWindowFunction::BrightenDark || f == ImageWindowFunction::DarkenLight)
+        return translateImage();
+    return true;
 }
 
 bool ImageWindow::setScaleMode(ImageWindowScaling newMode)
@@ -650,11 +660,55 @@ void ImageWindow::paintEvent(QPaintEvent *event)
 
 inline double ImageWindow::applyImageFunction(double value)
 {
-    if (function == ImageWindowFunction::Log10)
+    switch(this->function)
     {
-        if (value > 0) return log10(value); else return 0;
+    case ImageWindowFunction::Log10 :
+        return imageFunctionLog10(value);
+    case ImageWindowFunction::BrightenDark :
+        return imageFunctionBrightenDark(value);
+    case ImageWindowFunction::DarkenLight :
+        return imageFunctionDarkenLight(value);
+    default :
+        return imageFunctionNone(value);
     }
+}
+
+inline double ImageWindow::imageFunctionLog10(double value)
+{
+    if (value > 0) return log10(value); else return 0;
+}
+
+inline double ImageWindow::imageFunctionNone(double value)
+{
     return value;
+}
+
+inline double parabolicResponse(double input, double minVal, double maxVal, double dipFactor)
+{
+    // Parabolic profile. o = ai^2 + bi + c
+    // When i = minVal, o = minVal.
+    // when i = maxVal, o = maxVal.
+    // when i = (maxVal + minVal) / 2, o = (maxVal + minVal) / 2 * dipFactor.
+    const double a = 2 * (maxVal + minVal) * (1 - dipFactor) / (maxVal - minVal) / (maxVal - minVal);
+    const double b = 1 - a * (maxVal + minVal);
+    const double c = (1 - b) / (maxVal + minVal) * (maxVal + minVal) * (maxVal + minVal) / 4 + (b - dipFactor) * (maxVal + minVal) / 2;
+    return a * input * input + b * input + c;
+}
+
+inline double ImageWindow::imageFunctionBrightenDark(double value)
+{
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
+    double maxVal = sourceImage->getMaxValue();
+    double minVal = sourceImage->getMinValue();
+    return parabolicResponse(value, minVal, maxVal, dipFactor);
+}
+
+inline double ImageWindow::imageFunctionDarkenLight(double value)
+{
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
+    double maxVal = sourceImage->getMaxValue();
+    double minVal = sourceImage->getMinValue();
+    return parabolicResponse(value, minVal, maxVal, 1/dipFactor);
 }
 
 void ImageWindow::drawInfoBox()
@@ -947,8 +1001,13 @@ void ImageWindow::drawColorbar()
 
     QString title;
     title = getColormapName();
+    QString dipFactorString = QString().asprintf("%0.03f", dipFactor);
     if (getImageFunction() == ImageWindowFunction::Log10)
         title.append(" log");
+    else if (getImageFunction() == ImageWindowFunction::DarkenLight)
+        title.append(" darken (" + dipFactorString + ")");
+    else if (getImageFunction() == ImageWindowFunction::BrightenDark)
+        title.append(" brighten (" + dipFactorString + ")");
     if (getScaleMode() == ImageWindowScaling::Fit)
         title.append(" fit");
 
@@ -1419,6 +1478,8 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
 
     switch(event->key())
     {
+        case Qt::Key_Shift:
+            break;
         case Qt::Key_QuoteLeft:
         {
             if (mods == Qt::ControlModifier)
@@ -1591,15 +1652,29 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             setColormap((ColormapPalette)map);
             break;
         }
+        case Qt::Key_Plus:
+        {
+            setDipFactor(dipFactor * 1.25);
+            break;
+        }
+        case Qt::Key_Minus:
+        {
+            setDipFactor(dipFactor / 1.25);
+            break;
+        }
         case Qt::Key_F:
         {
-            if (mods != Qt::NoModifier) break;
+            int wf = (int)getImageFunction();
+            if (mods == Qt::NoModifier)
+                wf--;
+            else if (mods == Qt::ShiftModifier)
+                wf++;
+            if (wf == (int)ImageWindowFunction::NUM_WINDOFUNCTIONS)
+                wf = 0;
+            else if (wf == -1)
+                wf = (int)ImageWindowFunction::NUM_WINDOFUNCTIONS - 1;
 
-            ImageWindowFunction f = getImageFunction();
-            if (f == ImageWindowFunction::OneToOne)
-                setImageFunction(ImageWindowFunction::Log10);
-            else
-                setImageFunction(ImageWindowFunction::OneToOne);
+            setImageFunction((ImageWindowFunction)wf);
             break;
         }
         case Qt::Key_S:
@@ -1785,7 +1860,8 @@ void ImageWindow::drawHelp()
     menu.append("X                               toggle rulers\n"); numLines++;
     menu.append("\n"); numLines++;
     menu.append("V / SHIFT+V                   cycle colormaps\n"); numLines++;
-    menu.append("F                 toggle pixel value function\n"); numLines++;
+    menu.append("F / SHIFT+F       toggle pixel value function\n"); numLines++;
+    menu.append("+ / -    alter dip factor for brighten/darken\n"); numLines++;
     menu.append("S                    toggle pixel value scale\n"); numLines++;
     menu.append("W                   compute ROI white balance\n"); numLines++;
     menu.append("A / SHIFT+A               rotate image 90 deg\n"); numLines++;
