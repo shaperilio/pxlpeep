@@ -1742,6 +1742,12 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                 break;
             }
 
+            if (mods == Qt::ShiftModifier && sourceImage != nullptr && !forwarded)
+            {
+                sourceImage->resetWhiteBalance();
+                break;
+            }
+
             if (mods == Qt::NoModifier && ROIisValid && sourceImage != nullptr && !forwarded)
                 sourceImage->doWhiteBalance(ROI);
             break;
@@ -1918,6 +1924,7 @@ void ImageWindow::drawHelp()
     menu.append("= / -    alter dip factor for brighten/darken\n"); numLines++;
     menu.append("S                    toggle pixel value scale\n"); numLines++;
     menu.append("W                   compute ROI white balance\n"); numLines++;
+    menu.append("SHIFT+W                   reset white balance\n"); numLines++;
     menu.append("A / SHIFT+A               rotate image 90 deg\n"); numLines++;
     menu.append("R                          toggle red channel\n"); numLines++;
     menu.append("SHIFT+R                      red channel only\n"); numLines++;

@@ -42,6 +42,7 @@ public:
     void recalcMinMax();
 
     bool doWhiteBalance(QRect &Area);
+    bool resetWhiteBalance();
 
     bool getEXIFMake(QString &make) {make = EXIFMake; return haveEXIFMake;}
     bool getEXIFFirmware(QString &firmware) {firmware = EXIFFirmware; return haveEXIFFirmware;}
@@ -82,9 +83,14 @@ protected:
     //For grey scale images, we assume that we have a bayer array and thus we are looking
     //to equate the grey values within a 2x2 pixel area.
     bool doWhiteBalanceGrey(QRect &greyArea);
+    double greyGains[2][2];
 
     //For color, we just calculate gains for each color.
     bool doWhiteBalanceColor(QRect &colorArea);
+    double colorGains[3];
+
+    bool resetWhiteBalanceGrey();
+    bool resetWhiteBalanceColor();
 
     void retrieveEXIFTags(FIBITMAP *img);
     void resetEXIFStatus();

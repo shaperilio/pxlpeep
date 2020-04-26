@@ -15,6 +15,15 @@ void ImageData::initClass()
     BPP = -1;
     data = nullptr;
 
+    colorGains[0] = 1;
+    colorGains[1] = 1;
+    colorGains[2] = 1;
+
+    greyGains[0][0] = 1;
+    greyGains[1][0] = 1;
+    greyGains[0][1] = 1;
+    greyGains[1][1] = 1;
+
     resetMinMax();
 
     painter = nullptr;
@@ -473,6 +482,14 @@ void ImageData::feedDataReverse(ushort *image)
     if (painter != nullptr) painter->signalNewData();
 }
 
+bool ImageData::resetWhiteBalance()
+{
+    if (getNumChannels() == 1)
+        return resetWhiteBalanceGrey();
+    else
+        return resetWhiteBalanceColor();
+}
+
 bool ImageData::doWhiteBalance(QRect &Area)
 {
     cout << "White balance on ROI x: " << Area.x() << " y: " << Area.y() << " w: " << Area.width() << " h: " << Area.height() << endl;
@@ -484,6 +501,8 @@ bool ImageData::doWhiteBalance(QRect &Area)
 
 bool ImageData::doWhiteBalanceGrey(QRect &greyArea)
 {
+    // We force a 2x2 area and do white balance separately on these so that it also works for
+    // raw Bayer images.
     if(greyArea.width() < 2 || greyArea.height() < 2)
         return false; //not big enough.
 
@@ -536,10 +555,41 @@ bool ImageData::doWhiteBalanceGrey(QRect &greyArea)
             setPixel(c, r, 0, getPixel(c, r, 0)*gains[c % 2][r % 2]);
         }
 
+    //Store the combined gains so as to be able to reset this later.
+    greyGains[0][0] *= gains[0][0];
+    greyGains[0][1] *= gains[0][1];
+    greyGains[1][0] *= gains[1][0];
+    greyGains[1][1] *= gains[1][1];
+
     //Image altered. We need to recalculate min/max.
     //It will also trigger a re-translation/paint of the image if an
     //ImageWindow is assigned as the painter.
     recalcMinMax();
+
+    return true;
+}
+
+bool ImageData::resetWhiteBalanceGrey()
+{
+    int c, r;
+
+    #pragma omp parallel for private(r)
+    for (c = 0; c < getWidth(); c++)
+        for (r = 0; r < getHeight(); r++)
+        {
+            setPixel(c, r, 0, getPixel(c, r, 0)/greyGains[c % 2][r % 2]);
+        }
+
+    //Image altered. We need to recalculate min/max.
+    //It will also trigger a re-translation/paint of the image if an
+    //ImageWindow is assigned as the painter.
+    recalcMinMax();
+
+    // Reset the gains, or continuously "resetting" white balance will actually keep changing the image.
+    greyGains[0][0] = 1;
+    greyGains[1][0] = 1;
+    greyGains[0][1] = 1;
+    greyGains[1][1] = 1;
 
     return true;
 }
@@ -596,10 +646,42 @@ bool ImageData::doWhiteBalanceColor(QRect &colorArea)
         }
     }
 
+    //Store the combined gains so as to be able to reset this later.
+    colorGains[0] *= gains[0];
+    colorGains[1] *= gains[1];
+    colorGains[2] *= gains[2];
+
     //Image altered. We need to recalculate min/max.
     //It will also trigger a re-translation/paint of the image if an
     //ImageWindow is assigned as the painter.
     recalcMinMax();
+
+    return true;
+}
+
+bool ImageData::resetWhiteBalanceColor()
+{
+    int c, r;
+
+    #pragma omp parallel for private(r)
+    for (c = 0; c < getWidth(); c++)
+    {
+        for (r = 0; r < getHeight(); r++)
+        {
+            setPixel(c, r, 0, getPixel(c, r, 0)/colorGains[0]);
+            setPixel(c, r, 1, getPixel(c, r, 1)/colorGains[1]);
+            setPixel(c, r, 2, getPixel(c, r, 2)/colorGains[2]);
+        }
+    }
+
+    //Image altered. We need to recalculate min/max.
+    //It will also trigger a re-translation/paint of the image if an
+    //ImageWindow is assigned as the painter.
+    recalcMinMax();
+
+    colorGains[0] = 1;
+    colorGains[1] = 1;
+    colorGains[2] = 1;
 
     return true;
 }
