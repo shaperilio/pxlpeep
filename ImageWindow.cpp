@@ -468,14 +468,14 @@ void ImageWindow::handleMousePressEvent(QMouseEvent *event, bool forwarded)
 {
     setShowHelp(false);
 
-    if(event->buttons() == Qt::MiddleButton)
+    if(event->buttons() == Qt::LeftButton && event->modifiers() != Qt::ShiftModifier)
     {
         panRef = event->globalPos();
         setCursor(Qt::ClosedHandCursor);
     }
     else if (event->buttons() == Qt::RightButton)
         mouseDragRef = event->globalPos() - frameGeometry().topLeft();
-    else if (event->buttons() == Qt::LeftButton)
+    else if (event->buttons() == Qt::LeftButton && event->modifiers() == Qt::ShiftModifier)
     {
         ROI1 = QPoint(floor(mapToScene(event->pos()).x() + 0.5), floor(mapToScene(event->pos()).y() + 0.5));
         checkROIpoint(ROI1);
@@ -496,7 +496,7 @@ void ImageWindow::handleMouseReleaseEvent(QMouseEvent *event, bool forwarded)
     setCursor(Qt::CrossCursor);
 
     //Note the use of button and not buttons!
-    if (event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton && event->modifiers() == Qt::ShiftModifier)
     {
         //Select an ROI. This is here so that a single click will clear the ROI.
         ROI2 = QPoint(floor(mapToScene(event->pos()).x() + 0.5), floor(mapToScene(event->pos()).y() + 0.5));
@@ -523,7 +523,7 @@ void ImageWindow::handleMouseMoveEvent(QMouseEvent *event, bool forwarded)
         QPoint delta = event->globalPos() - mouseDragRef;
         move(delta);
     }
-    else if (event->buttons() == Qt::MiddleButton)
+    else if (event->buttons() == Qt::LeftButton && event->modifiers() != Qt::ShiftModifier)
     {
         //Pan the image.
         QPoint panDelta = event->globalPos() - panRef;
@@ -532,7 +532,7 @@ void ImageWindow::handleMouseMoveEvent(QMouseEvent *event, bool forwarded)
         verticalScrollBar()->setValue  (verticalScrollBar()->value()   - panDelta.y());
         panRef = event->globalPos();
     }
-    else if (event->buttons() == Qt::LeftButton)
+    else if (event->buttons() == Qt::LeftButton && event->modifiers() == Qt::ShiftModifier)
     {
         //Select an ROI.
         ROI2 = QPoint(floor(mapToScene(event->pos()).x() + 0.5), floor(mapToScene(event->pos()).y() + 0.5));
@@ -1499,11 +1499,7 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
 
     switch(event->key())
     {
-        case Qt::Key_Shift:
-        case Qt::Key_Control:
-        case Qt::Key_Alt:
-            break;
-        case Qt::Key_QuoteLeft:
+        case Qt::Key_1:
         {
             if (mods == Qt::ControlModifier)
                 zoomFit();
@@ -1518,7 +1514,7 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             }
             break;
         }
-        case Qt::Key_1:
+        case Qt::Key_2:
         {
             if (mods == Qt::ControlModifier)
                 zoom1To1();
@@ -1540,13 +1536,14 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                     snapWindowTo(TopLeft, -1);
                     break;
                 }
-                if (mods == (Qt::AltModifier     | Qt::ShiftModifier) ||
-                    mods == (Qt::ControlModifier | Qt::KeypadModifier | Qt::KeypadModifier))
+                if (mods == (Qt::AltModifier | Qt::ShiftModifier) ||
+                    mods == (Qt::AltModifier | Qt::ShiftModifier | Qt::KeypadModifier))
                 {
                     snapWindowTo(BottomLeft, -1);
                     break;
                 }
-                if (mods == Qt::NoModifier || Qt::KeypadModifier)
+                if (mods == Qt::NoModifier ||
+                    mods == Qt::KeypadModifier)
                 {
                     readPrevImage();
                     break;
@@ -1567,13 +1564,13 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                     break;
                 }
                 if (mods == (Qt::ControlModifier | Qt::ShiftModifier) ||
-                    mods == (Qt::ControlModifier | Qt::KeypadModifier | Qt::KeypadModifier))
+                    mods == (Qt::ControlModifier | Qt::ShiftModifier | Qt::KeypadModifier))
                 {
                     snapWindowTo(TopRight, -1);
                     break;
                 }
-                if (mods == (Qt::AltModifier     | Qt::ShiftModifier) ||
-                    mods == (Qt::ControlModifier | Qt::KeypadModifier | Qt::KeypadModifier))
+                if (mods == (Qt::AltModifier | Qt::ShiftModifier) ||
+                    mods == (Qt::AltModifier | Qt::ShiftModifier | Qt::KeypadModifier))
                 {
                     snapWindowTo(BottomRight, -1);
                     break;
@@ -1610,6 +1607,8 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         }
         case Qt::Key_Delete:
         {
+            if (mods != Qt::NoModifier) break;
+
             if (forwarded)
                 break;
             deleteCurrentFile();
@@ -1683,16 +1682,20 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         }
         case Qt::Key_Equal:
         {
+            if (mods != Qt::NoModifier) break;
+
             setDipFactor(dipFactor * 1.25);
             break;
         }
         case Qt::Key_Minus:
         {
+            if (mods != Qt::NoModifier) break;
+
             setDipFactor(dipFactor / 1.25);
             break;
         }
         case Qt::Key_F:
-        {
+        {   
             int wf = (int)getImageFunction();
             if (mods == Qt::NoModifier)
                 wf--;
@@ -1724,10 +1727,22 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
 
             break;
         }
+        case Qt::Key_F4:
+        {
+            if (mods == Qt::ControlModifier) {
+                this->close();
+                break;
+            }
+            break;
+        }
         case Qt::Key_W:
         {
-            if (mods != Qt::NoModifier) break;
-            if (ROIisValid && sourceImage != nullptr)
+            if (mods == Qt::ControlModifier) {
+                this->close();
+                break;
+            }
+
+            if (mods == Qt::NoModifier && ROIisValid && sourceImage != nullptr && !forwarded)
                 sourceImage->doWhiteBalance(ROI);
             break;
         }
@@ -1750,6 +1765,12 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         }
         case Qt::Key_R:
         {
+            if (mods == Qt::ControlModifier && !forwarded)
+            {
+                readImage(curFilename);
+                break;
+            }
+
             if (mods == Qt::ShiftModifier)
                 activeChannels = chanR;
             else if (mods == Qt::NoModifier)
@@ -1793,16 +1814,18 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             viewport()->update();
             break;
         }
+        case Qt::Key_Shift:
+        case Qt::Key_Control:
+        case Qt::Key_Alt:
+        case Qt::Key_Meta: // control key on Mac
+            break;
         default:
         {
-            if (mods == Qt::ControlModifier ||
-                mods == Qt::AltModifier ||
-                mods == Qt::ShiftModifier ||
-                mods == (Qt::ControlModifier | Qt::ShiftModifier) ||
-                mods == (Qt::ControlModifier | Qt::AltModifier) ||
-                mods == (Qt::ShiftModifier   | Qt::AltModifier) ||
-                mods == (Qt::ControlModifier | Qt::AltModifier | Qt::ShiftModifier)
-                )
+            if (mods | Qt::ControlModifier ||
+                mods | Qt::AltModifier ||
+                mods | Qt::ShiftModifier ||
+                mods | Qt::MetaModifier
+               )
                 break; //don't show help for all the aux keys.
             showHelp = true;
             viewport()->update();
@@ -1855,8 +1878,8 @@ void ImageWindow::drawHelp()
     int numLines = 1;
     menu.append("\n");                                   numLines++;
     menu.append("--Mouse--\n");                          numLines++;
-    menu.append("Left button                        select ROI\n"); numLines++;
-    menu.append("Middle button                             pan\n"); numLines++;
+    menu.append("Left button                               pan\n"); numLines++;
+    menu.append("SHFIT+Left button                  select ROI\n"); numLines++;
     menu.append("Right button                      move window\n"); numLines++;
     menu.append("Wheel                                    zoom\n"); numLines++;
     menu.append("\n");                                   numLines++;
@@ -1869,8 +1892,10 @@ void ImageWindow::drawHelp()
     menu.append("CTRL+SHIFT+lt arrow         1/4-size top left\n"); numLines++;
     menu.append("ALT+SHIFT+lt arrow       1/4-size bottom left\n"); numLines++;
     menu.append("CTRL+dn arrow               1/4-size centered\n"); numLines++;
+    menu.append("CTRL+W (or F4)                   close window\n"); numLines++;
     menu.append("M                           raise main window\n"); numLines++;
     menu.append("\n"); numLines++;
+    menu.append("CTRL+V             paste image from clibpoard\n"); numLines++;
     menu.append("CTRL+C                copy image to clibpoard\n"); numLines++;
     menu.append("CTRL+SHIFT+C     copy screenshot to clibpoard\n"); numLines++;
     menu.append("CTRL+ALT+C                 save image to file\n"); numLines++;
@@ -1878,11 +1903,11 @@ void ImageWindow::drawHelp()
     menu.append("\n"); numLines++;
     menu.append("lt arrow                       previous image\n"); numLines++;
     menu.append("rt arrow                           next image\n"); numLines++;
-    menu.append("F5                               reload image\n"); numLines++;
+    menu.append("F5 or CTRL+R                     reload image\n"); numLines++;
     menu.append("Del                    delete image from disk\n"); numLines++;
     menu.append("\n"); numLines++;
-    menu.append("CTRL+`                            zoom to fit\n"); numLines++;
-    menu.append("CTRL+1                               zoom 1:1\n"); numLines++;
+    menu.append("CTRL+1                            zoom to fit\n"); numLines++;
+    menu.append("CTRL+2                               zoom 1:1\n"); numLines++;
     menu.append("\n"); numLines++;
     menu.append("I                             toggle info box\n"); numLines++;
     menu.append("C                            toggle color bar\n"); numLines++;
