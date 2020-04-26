@@ -900,12 +900,10 @@ void ImageWindow::drawRulers()
     while (1)
     {
         xDraw = mapFromScene(xImg, 0).x(); //convert to viewport coordinates.
-        while (xDraw < cornerMargin)
+        if (xDraw < cornerMargin)
         {
-            xImg += 1;
-            xDraw = mapFromScene(xImg, 0).x(); //convert to viewport coordinates.
-            if (xImg > getImageWidth())
-                break;
+            xDraw = cornerMargin;
+            xImg = floor(mapToScene(xDraw, 0).x()) + 0.5;
         }
         if (xDraw > viewport()->width() - 1 - cornerMargin || xImg > getImageWidth()) break; //reached the other end.
 
@@ -941,18 +939,35 @@ void ImageWindow::drawRulers()
     }
 
     //Vertical ruler
-    double yImg = 0.5, yDraw, oldyImg;
+    double yImg = 0.5, yDraw, oldyImg, ySign = 1;
+    if (imgYOriginIsBottom)
+    {
+        yImg = getImageHeight() - 0.5;
+        ySign = -1;
+    }
     while (1)
     {
         yDraw = mapFromScene(0, yImg).y(); //convert to viewport coordinates.
-        while (yDraw < cornerMargin)
+        if (!imgYOriginIsBottom)
         {
-            yImg += 1;
-            yDraw = mapFromScene(0, yImg).y(); //convert to viewport coordinates.
-            if (yImg > getImageHeight())
-                break;
+            // Start drawing the ruler at the top.
+            if (yDraw < cornerMargin)
+            {
+                yDraw = cornerMargin;
+                yImg = floor(mapToScene(0, yDraw).y()) + 0.5;
+            }
+            if (yDraw > viewport()->height() - 1 - cornerMargin || yImg > getImageHeight()) break; //reached the other end.
         }
-        if (yDraw > viewport()->height() - 1 - cornerMargin || yImg > getImageHeight()) break; //reached the other end.
+        else
+        {
+            // Since we're starting at the bottom, these conditions have to change.
+            if (yDraw > viewport()->height() - 1 - cornerMargin)
+            {
+                yDraw = viewport()->height() - 1 - cornerMargin;
+                yImg = floor(mapToScene(0, yDraw).y()) + 0.5;
+            }
+            if (yDraw < cornerMargin || yImg < 0) break; //reached the other end.
+        }
 
         //If we get here, draw our ruler tick and label it.
         p.setBrush(blackBrush);
@@ -987,11 +1002,11 @@ void ImageWindow::drawRulers()
         //Remember this as the previous image coordinate.
         oldyImg = yImg;
 
-        yDraw += (double)minTickSpacingpix; //increment to the next tick mark, and calculate new image coordinate.
+        yDraw += ySign * (double)minTickSpacingpix; //increment to the next tick mark, and calculate new image coordinate.
         yImg = floor(mapToScene(0, yDraw).y()) + 0.5; //the 0.5 is to be at the middle of zoomed-in pixels.
         if (yImg == oldyImg) //can happen if we're zoomed in too much; increment xImg manually.
-            yImg += 1;
-        if (yImg > getImageHeight()) //done with image.
+            yImg += ySign * 1;
+        if (yImg > getImageHeight() || yImg < 0) //done with image.
             break;
     }
 }
@@ -1816,7 +1831,6 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             if (mods != Qt::NoModifier) break;
 
             imgYOriginIsBottom = !imgYOriginIsBottom;
-            drawRulers();
             viewport()->update();
             break;
         }
