@@ -56,6 +56,7 @@ ImageWindow::ImageWindow(Colormapper &map, int ID)
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     setBackgroundBrush(QBrush(Qt::darkGreen));
 
     setCursor(Qt::CrossCursor);
@@ -634,19 +635,14 @@ void ImageWindow::zoom(int zoomIncrement)
 
         zoomFactor = pow(zoomStep, zoomLevel);
     }
+    auto zoomLocationOnImageBefore = mapToScene(zoomCtr);
     QMatrix scaleMatrix;
     scaleMatrix.scale(zoomFactor, zoomFactor);
     setMatrix(scaleMatrix);
-
-    //Now move the scroll bars so that zooming is centered, but only if zooming in!
-    //Does not apply for 1:1 zoom.
-    if (zoomIncrement != 0 && zoomIncrement > 0)
-    {
-        QPoint windowCtr(geometry().width()/2, geometry().height()/2);
-        QPoint delta(zoomCtr - windowCtr);
-        horizontalScrollBar()->setValue(horizontalScrollBar()->value() + delta.x());
-        verticalScrollBar()  ->setValue(verticalScrollBar()  ->value() + delta.y());
-    }
+    auto zoomCtrAfter = mapFromScene(zoomLocationOnImageBefore);
+    auto zoomLocationDelta = zoomCtrAfter - zoomCtr;
+    horizontalScrollBar()->setValue(horizontalScrollBar()->value() + zoomLocationDelta.x());
+    verticalScrollBar()  ->setValue(verticalScrollBar()  ->value() + zoomLocationDelta.y());
 }
 
 void ImageWindow::paintEvent(QPaintEvent *event)
@@ -1685,6 +1681,7 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             setColormap((ColormapPalette)map);
             break;
         }
+        case Qt::Key_Equal:
         case Qt::Key_Plus:
         {
             setDipFactor(dipFactor * 1.25);
