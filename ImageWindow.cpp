@@ -1682,7 +1682,6 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             break;
         }
         case Qt::Key_Equal:
-        case Qt::Key_Plus:
         {
             setDipFactor(dipFactor * 1.25);
             break;
@@ -1891,7 +1890,7 @@ void ImageWindow::drawHelp()
     menu.append("\n"); numLines++;
     menu.append("V / SHIFT+V                   cycle colormaps\n"); numLines++;
     menu.append("F / SHIFT+F       toggle pixel value function\n"); numLines++;
-    menu.append("+ / -    alter dip factor for brighten/darken\n"); numLines++;
+    menu.append("= / -    alter dip factor for brighten/darken\n"); numLines++;
     menu.append("S                    toggle pixel value scale\n"); numLines++;
     menu.append("W                   compute ROI white balance\n"); numLines++;
     menu.append("A / SHIFT+A               rotate image 90 deg\n"); numLines++;
