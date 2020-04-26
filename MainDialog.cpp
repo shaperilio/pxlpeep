@@ -223,11 +223,8 @@ QString MainDialog::retrieveLastFileType()
     return s.value(key).toString();
 }
 
-void MainDialog::openAndShow(int windowID, QString filename)
+int MainDialog::setNextWindowButton()
 {
-    ImageWindow *imgWindow;
-
-    //We take this chance to find the next available window.
     int i;
     for (i = 0; i < MAX_BUTTONS; i++)
     {
@@ -239,6 +236,26 @@ void MainDialog::openAndShow(int windowID, QString filename)
     }
     if (i == MAX_BUTTONS) //no unused windows; mark the next one for reuse.
         nextButton = (nextButton + 1) % MAX_BUTTONS;
+
+    return nextButton;
+}
+
+void MainDialog::showImageWindow(ImageWindow *imgWindow)
+{
+    imgWindow->holdAll();
+    imgWindow->setColormap(ColormapPalette::Grey);
+    imgWindow->setImageFunction(ImageWindowFunction::OneToOne);
+    imgWindow->releaseAll(); // Release before you zoom fit, or the image won't be centered.
+    imgWindow->zoomFit();
+    imgWindow->showWindow();
+}
+
+void MainDialog::openAndShow(int windowID, QString filename)
+{
+    ImageWindow *imgWindow;
+
+    //We take this chance to find the next available window.
+    setNextWindowButton();
 
     int ID;
     if (windowID == -1)
@@ -283,14 +300,34 @@ void MainDialog::openAndShow(int windowID, QString filename)
     }
     storeLastOpenFrom(filename);
     storeLastFileType(lastFileType);
-    imgWindow->holdAll();
-    imgWindow->setColormap(ColormapPalette::Grey);
-    imgWindow->setImageFunction(ImageWindowFunction::OneToOne);
-    imgWindow->setWindowTitle(filename);
-    this->setButtonText(ID, filename);
-    imgResult = imgWindow->releaseAll(); // Release before you zoom fit, or the image won't be centered.
-    imgWindow->zoomFit();
-    imgWindow->showWindow();
+    showImageWindow(imgWindow);
+}
+
+void MainDialog::openAndPaste(int windowID)
+{
+    ImageWindow *imgWindow;
+
+    setNextWindowButton();
+
+    int ID;
+    if (windowID == -1)
+        ID = nextButton;
+    else
+        ID = windowID;
+
+    if (imgWindows[ID] == nullptr) imgWindows[ID] = new ImageWindow(colormap, ID);
+
+    imgWindow = imgWindows[ID];
+    imgWindow->myButtonNo = ID;
+    imgWindow->parent = this;
+    connectSignals(ID);
+
+    if (!imgWindow->pasteFromClipboard())
+    {
+        imgWindow->close();
+        return;
+    }
+    showImageWindow(imgWindow);
 }
 
 void MainDialog::setButtonText(int ID, QString text)
@@ -301,6 +338,13 @@ void MainDialog::setButtonText(int ID, QString text)
 
 void MainDialog::keyPressEvent(QKeyEvent *e)
 {
+    Qt::KeyboardModifiers mods = QApplication::keyboardModifiers();
+
+    if(e->key() == Qt::Key_V && mods == Qt::ControlModifier)
+    {
+        openAndPaste(-1);
+        return;
+    }
     if(e->key() != Qt::Key_Escape)
         QDialog::keyPressEvent(e);
 }

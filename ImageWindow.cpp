@@ -1468,23 +1468,28 @@ void ImageWindow::copyScreenshotToClipboard()
 }
 
 #include <QDateTime>
-void ImageWindow::pasteFromClipboard()
+bool ImageWindow::pasteFromClipboard()
 {
     QClipboard *clipboard = QApplication::clipboard();
     if (clipboard == nullptr)
     {
         cerr << "Clibpard is null!" << endl;
-        return;
+        return false;
     }
     QImage cbImage = clipboard->image();
+    if (cbImage.isNull())
+    {
+        cerr << "Clibpard does not contain an image!" << endl;
+        return false;
+    }
     QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".tif";
     if(cbImage.save(filename))
     {
         cout << "Saved clipboard image to " << filename.toStdString() << endl;
-        this->readImage(filename);
+        return this->readImage(filename);
     }
-    else
-        cerr << "Failed to save clipboard image to " << filename.toStdString() << endl;
+    cerr << "Failed to save clipboard image to " << filename.toStdString() << endl;
+    return false;
 }
 
 void ImageWindow::saveScreenshotToFile()

@@ -127,6 +127,8 @@ public:
 
     bool signalNewData() {bool r = translateImage(); if (r) viewport()->update(); return r;}
 
+    bool pasteFromClipboard();
+
 protected:
     int ID; // ID for the main window, to communicate back when we're done.
     QImage translatedImage;   //need an image to access pixels directly, but...
@@ -244,7 +246,6 @@ protected:
     void saveImageToFile();
     bool takeScreenshot(QImage &screenshot);
     void copyScreenshotToClipboard();
-    void pasteFromClipboard();
     void saveScreenshotToFile();
 
     void setTitle(QString title);

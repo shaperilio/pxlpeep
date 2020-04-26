@@ -60,7 +60,10 @@ protected:
     void     storeLastFileType(QString lastType);
     QString retrieveLastFileType();
 
+    int setNextWindowButton();
+    void showImageWindow(ImageWindow *imgWindow);
     void openAndShow(int windowID, QString filename);
+    void openAndPaste(int windowID);
 
     void resetButton(int ID);
 
