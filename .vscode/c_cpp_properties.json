@@ -7,7 +7,14 @@
             ],
             "includePath": [
                 "${workspaceFolder}/**",
-                "/Users/barf/Qt/5.14.2/clang_64/include/**"
+                "/Users/barf/Qt/5.14.2/clang_64/lib/QtWidgets.framework",
+                "/Users/barf/Qt/5.14.2/clang_64/lib/QtWidgets.framework/Headers",
+                "/Users/barf/Qt/5.14.2/clang_64/lib/QtGui.framework",
+                "/Users/barf/Qt/5.14.2/clang_64/lib/QtGui.framework/Headers",
+                "/Users/barf/Qt/5.14.2/clang_64/lib/QtCore.framework",
+                "/Users/barf/Qt/5.14.2/clang_64/lib/QtCore.framework/Headers",
+                "/Users/barf/Qt/5.14.2/clang_64/.//mkspecs/macx-clang",
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/OpenGL.framework/Headers"
             ],
             "macFrameworkPath": [
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"

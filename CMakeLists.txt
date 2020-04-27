@@ -15,6 +15,10 @@ message("CMake version: ${CMAKE_VERSION}")
 # You must have this set here or find_package will fail.
 SET(CMAKE_PREFIX_PATH "/Users/barf/Qt/5.14.2/clang_64")
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+if (Qt5Widgets_FOUND)
+    message("Qt version ${Qt5Widgets_VERSION}")
+    message("Include path: ${Qt5Widgets_INCLUDE_DIRS}")
+endif()
 
 # These are from my .pro file
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Xpreprocessor -fopenmp")
