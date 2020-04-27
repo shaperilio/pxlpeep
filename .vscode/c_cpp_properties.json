@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "defines": [
+                "Q_OS_MACOS"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/Users/barf/Qt/5.14.2/clang_64/include/**"
+            ],
+            "macFrameworkPath": [
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang++",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "${default}",
+            "compilerArgs": [
+                "-Xpreprocessor",
+                "-fopenmp"
+            ]
+        }
+    ],
+    "version": 4
+}
