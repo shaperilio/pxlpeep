@@ -22,7 +22,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp")
 
 link_directories("/usr/local/opt/freeimage/lib"
                  "/usr/local/opt/libomp/lib"
-                 "/usr/local/lib"
+                 # "/usr/local/lib" # appears to be unnecessary
                  )
 
 include_directories("/usr/local/opt/freeimage/include"
@@ -50,8 +50,7 @@ set(MACOSX_BUNDLE_ICON_FILE loupe.icns)
 
 # And this part tells CMake where to find and install the file itself
 set(myApp_ICON ${CMAKE_CURRENT_SOURCE_DIR}/loupe.icns)
-set_source_files_properties(${myApp_ICON} PROPERTIES
-       MACOSX_PACKAGE_LOCATION "Resources")
+set_source_files_properties(${myApp_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
 #add_executable(${CMAKE_PROJECT_NAME} ${sources})
 
