@@ -186,8 +186,6 @@ bool ImageWindow::setImageFunction(ImageWindowFunction newFunction)
 {
     if (newFunction == getImageFunction()) return true;
     function = newFunction;
-//    if (function == ImageWindowFunction::Log10 && getScaleMode() != ImageWindowScaling::Fit)
-//        return setScaleMode(ImageWindowScaling::Fit);
     return translateImage();
 }
 
@@ -195,9 +193,9 @@ bool ImageWindow::setDipFactor(double dipFactor)
 {
     this->dipFactor = dipFactor;
     auto f = this->getImageFunction();
-    if (f == ImageWindowFunction::BrightenDark || f == ImageWindowFunction::DarkenLight)
+//    if (f == ImageWindowFunction::BrightenDark || f == ImageWindowFunction::DarkenLight)
         return translateImage();
-    return true;
+//    return true;
 }
 
 bool ImageWindow::setScaleMode(ImageWindowScaling newMode)
@@ -300,6 +298,8 @@ bool ImageWindow::getTranslationParamsString(QString &params)
 
 bool ImageWindow::translateImage()
 {
+    cout << "Translating image; dipFactor = " << this->dipFactor << endl;
+
     if (colormap == nullptr)
         return false;
 
@@ -664,8 +664,10 @@ inline double ImageWindow::applyImageFunction(double value)
 {
     switch(this->function)
     {
-    case ImageWindowFunction::Log10 :
-        return imageFunctionLog10(value);
+    case ImageWindowFunction::Log10BrightenDark :
+        return imageFunctionLog10BrightenDark(value);
+    case ImageWindowFunction::Log10DarkenLight :
+        return imageFunctionLog10DarkenLight(value);
     case ImageWindowFunction::BrightenDark :
         return imageFunctionBrightenDark(value);
     case ImageWindowFunction::DarkenLight :
@@ -675,9 +677,14 @@ inline double ImageWindow::applyImageFunction(double value)
     }
 }
 
-inline double ImageWindow::imageFunctionLog10(double value)
+inline double ImageWindow::imageFunctionLog10BrightenDark(double value)
 {
-    if (value > 0) return log10(value); else return 0;
+    if (value > 0) return log10(value * dipFactor * dipFactor); else return 0;
+}
+
+inline double ImageWindow::imageFunctionLog10DarkenLight(double value)
+{
+    if (value > 0) return log10(value / dipFactor / dipFactor); else return 0;
 }
 
 inline double ImageWindow::imageFunctionNone(double value)
@@ -1019,12 +1026,14 @@ void ImageWindow::drawColorbar()
     QString title;
     title = getColormapName();
     QString dipFactorString = QString().asprintf("%0.03f", dipFactor);
-    if (getImageFunction() == ImageWindowFunction::Log10)
-        title.append(" log");
+    if (getImageFunction() == ImageWindowFunction::Log10DarkenLight)
+        title.append(" log darken (" + dipFactorString + ")");
+    else if (getImageFunction() == ImageWindowFunction::Log10BrightenDark)
+        title.append(" log brighten (" + dipFactorString + ")");
     else if (getImageFunction() == ImageWindowFunction::DarkenLight)
-        title.append(" darken (" + dipFactorString + ")");
+        title.append(" parabolic darken (" + dipFactorString + ")");
     else if (getImageFunction() == ImageWindowFunction::BrightenDark)
-        title.append(" brighten (" + dipFactorString + ")");
+        title.append(" parabolic brighten (" + dipFactorString + ")");
     if (getScaleMode() == ImageWindowScaling::Fit)
         title.append(" fit");
 
@@ -1852,6 +1861,7 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                 mods | Qt::MetaModifier
                )
                 break; //don't show help for all the aux keys.
+            cout << "Default key press case." << endl;
             showHelp = true;
             viewport()->update();
             QGraphicsView::keyPressEvent(event);

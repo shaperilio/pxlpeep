@@ -18,7 +18,8 @@ enum ImageWindowScaling : int
 enum ImageWindowFunction : int
 {
     OneToOne,
-    Log10,
+    Log10BrightenDark,
+    Log10DarkenLight,
     BrightenDark,
     DarkenLight,
     NUM_WINDOFUNCTIONS
@@ -151,7 +152,8 @@ protected:
     int maxDisp;
     ImageWindowFunction function;
     inline double applyImageFunction(double value);
-    inline double imageFunctionLog10(double value);
+    inline double imageFunctionLog10BrightenDark(double value);
+    inline double imageFunctionLog10DarkenLight(double value);
     double dipFactor;
     bool setDipFactor(double dipFactor);
     inline double imageFunctionBrightenDark(double value);
