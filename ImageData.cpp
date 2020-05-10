@@ -571,11 +571,9 @@ bool ImageData::doWhiteBalanceGrey(QRect &greyArea)
 
 bool ImageData::resetWhiteBalanceGrey()
 {
-    int c, r;
-
-    #pragma omp parallel for private(r)
-    for (c = 0; c < getWidth(); c++)
-        for (r = 0; r < getHeight(); r++)
+    #pragma omp parallel
+    for (int c = 0; c < getWidth(); c++)
+        for (int r = 0; r < getHeight(); r++)
         {
             setPixel(c, r, 0, getPixel(c, r, 0)/greyGains[c % 2][r % 2]);
         }
@@ -661,12 +659,10 @@ bool ImageData::doWhiteBalanceColor(QRect &colorArea)
 
 bool ImageData::resetWhiteBalanceColor()
 {
-    int c, r;
-
-    #pragma omp parallel for private(r)
-    for (c = 0; c < getWidth(); c++)
+    #pragma omp parallel for
+    for (int c = 0; c < getWidth(); c++)
     {
-        for (r = 0; r < getHeight(); r++)
+        for (int r = 0; r < getHeight(); r++)
         {
             setPixel(c, r, 0, getPixel(c, r, 0)/colorGains[0]);
             setPixel(c, r, 1, getPixel(c, r, 1)/colorGains[1]);

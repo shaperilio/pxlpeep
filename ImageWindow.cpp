@@ -193,9 +193,10 @@ bool ImageWindow::setDipFactor(double dipFactor)
 {
     this->dipFactor = dipFactor;
     auto f = this->getImageFunction();
-//    if (f == ImageWindowFunction::BrightenDark || f == ImageWindowFunction::DarkenLight)
+    if (f == ImageWindowFunction::BrightenDark || f == ImageWindowFunction::DarkenLight ||
+        f == ImageWindowFunction::Log10BrightenDark || f == ImageWindowFunction::Log10DarkenLight)
         return translateImage();
-//    return true;
+    return true;
 }
 
 bool ImageWindow::setScaleMode(ImageWindowScaling newMode)
@@ -270,11 +271,10 @@ bool ImageWindow::getTranslationParamsString(QString &params)
     }
 
     params = "_";
-    QString temp;
-    params += temp.sprintf("s%d_", scaling);
-    params += temp.sprintf("f%d_", function);
-    params += temp.sprintf("m%d_", getColormap());
-    params += temp.sprintf("r%d", rotation);
+    params += QString::asprintf("s%d_", scaling);
+    params += QString::asprintf("f%d_", function);
+    params += QString::asprintf("m%d_", getColormap());
+    params += QString::asprintf("r%d", rotation);
     auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
     if (sourceImage->getNumChannels() == 1)
         return true;
@@ -464,7 +464,7 @@ void ImageWindow::checkROIpoint(QPoint &point)
         point.setY(sourceImage->getHeight());
 }
 
-void ImageWindow::handleMousePressEvent(QMouseEvent *event, bool forwarded)
+void ImageWindow::handleMousePressEvent(QMouseEvent *event, bool /*forwarded*/)
 {
     setShowHelp(false);
 
@@ -491,7 +491,7 @@ void ImageWindow::mousePressEvent(QMouseEvent *event)
     handleMousePressEvent(event, false);
 }
 
-void ImageWindow::handleMouseReleaseEvent(QMouseEvent *event, bool forwarded)
+void ImageWindow::handleMouseReleaseEvent(QMouseEvent *event, bool /*forwarded*/)
 {
     setCursor(Qt::CrossCursor);
 
@@ -561,7 +561,7 @@ void ImageWindow::mouseMoveEvent(QMouseEvent *event)
     handleMouseMoveEvent(event, false);
 }
 
-void ImageWindow::handleWheelEvent(QWheelEvent *event, bool forwarded)
+void ImageWindow::handleWheelEvent(QWheelEvent *event, bool /*forwarded*/)
 {
     showHelp = false;
 
@@ -732,9 +732,8 @@ void ImageWindow::drawInfoBox()
 
     //Width, height, zoom, and rotation
     auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
-    QString line2;
-    line2.sprintf("W = %d, H = %d pix (%.2fX)",
-                  sourceImage->getWidth(), sourceImage->getHeight(), zoomFactor);
+    QString line2 = QString::asprintf("W = %d, H = %d pix (%.2fX)",
+                                      sourceImage->getWidth(), sourceImage->getHeight(), zoomFactor);
 
     QString rot;
     switch (rotation)
@@ -759,7 +758,7 @@ void ImageWindow::drawInfoBox()
         double shutter, EV;
         sourceImage->getEXIFShutter(shutter);
         sourceImage->getEXIFEV(EV);
-        line3.sprintf("ISO = %d, shutter = %.2f ms, EV = %.2f", ISO, shutter, EV);
+        line3 = QString::asprintf("ISO = %d, shutter = %.2f ms, EV = %.2f", ISO, shutter, EV);
     }
 
     //Pixel coordinates
@@ -775,7 +774,7 @@ void ImageWindow::drawInfoBox()
 
     curX = zoomedPos.x() + (imgIsZeroIndexed ? 0 : 1) - 0.5;
 
-    line4.sprintf("X = %.1f, Y = %.1f", curX, curY);
+    line4 = QString::asprintf("X = %.1f, Y = %.1f", curX, curY);
 
     QString colorVal;
     if (zoomedPos.x() > 0 && zoomedPos.x() < sourceImage->getWidth() &&
@@ -812,24 +811,24 @@ void ImageWindow::drawInfoBox()
 
         if (sourceImage->getNumChannels() == 1)
         {
-            colorVal.sprintf(fmt, (int)sourceImage->getPixel(x, y, 0));
+            colorVal = QString::asprintf(fmt, (int)sourceImage->getPixel(x, y, 0));
             colorVal = " -> " + colorVal;
         }
         else
         {
             QString R, G, B;
             if (activeChannels & chanR)
-                R.sprintf(fmt, (int)sourceImage->getPixel(x, y, 0));
+                R = QString::asprintf(fmt, (int)sourceImage->getPixel(x, y, 0));
             else
                 R = "OFF";
 
             if (activeChannels & chanG)
-                G.sprintf(fmt, (int)sourceImage->getPixel(x, y, 1));
+                G = QString::asprintf(fmt, (int)sourceImage->getPixel(x, y, 1));
             else
                 G = "OFF";
 
             if (activeChannels & chanB)
-                B.sprintf(fmt, (int)sourceImage->getPixel(x, y, 2));
+                B = QString::asprintf(fmt, (int)sourceImage->getPixel(x, y, 2));
             else
                 B = "OFF";
 
@@ -838,10 +837,10 @@ void ImageWindow::drawInfoBox()
         line4.append(colorVal);
     }
 
-    int maxW = fm.width(line1);
-    if(fm.width(line2) > maxW) maxW = fm.width(line2);
-    if(line3Valid && fm.width(line3) > maxW) maxW = fm.width(line3);
-    if(fm.width(line4) > maxW) maxW = fm.width(line4);
+    int maxW = fm.horizontalAdvance(line1);
+    if(fm.horizontalAdvance(line2) > maxW) maxW = fm.horizontalAdvance(line2);
+    if(line3Valid && fm.horizontalAdvance(line3) > maxW) maxW = fm.horizontalAdvance(line3);
+    if(fm.horizontalAdvance(line4) > maxW) maxW = fm.horizontalAdvance(line4);
 
     int lineH = fm.height();
     int lineVspace = 0;
@@ -925,12 +924,11 @@ void ImageWindow::drawRulers()
 
         int xCoord = (int)floor(xImg);
         if (!imgIsZeroIndexed) xCoord++;
-        QString coord;
-        coord.sprintf("%d", xCoord);
-        QRect coordBox(xDraw + 2, tickLen - fm.height() + 2, fm.width(coord), fm.height());
+        QString coord = QString::asprintf("%d", xCoord);
+        QRect coordBox(xDraw + 2, tickLen - fm.height() + 2, fm.horizontalAdvance(coord), fm.height());
         p.fillRect(coordBox, blackBrush);
         p.drawText(coordBox, coord);
-        coordBox = QRect(xDraw + 2, r.height() - 1 - tickLen - 1, fm.width(coord), fm.height());
+        coordBox = QRect(xDraw + 2, r.height() - 1 - tickLen - 1, fm.horizontalAdvance(coord), fm.height());
         p.fillRect(coordBox, blackBrush);
         p.drawText(coordBox, coord);
 
@@ -995,13 +993,12 @@ void ImageWindow::drawRulers()
             if (imgYOriginIsBottom)
                 yCoord = getImageHeight() - 1 - yCoord;
 
-        QString coord;
-        coord.sprintf("%d", yCoord);
-        QRect coordBox(0, yDraw + 2, fm.width(coord) + 1, fm.height());
+        QString coord = QString::asprintf("%d", yCoord);
+        QRect coordBox(0, yDraw + 2, fm.horizontalAdvance(coord) + 1, fm.height());
         p.fillRect(coordBox, blackBrush);
         coordBox.setX(coordBox.x() + 1);
         p.drawText(coordBox, coord);
-        coordBox = QRect(r.width() - 1 - fm.width(coord), yDraw + 2, fm.width(coord) + 1, fm.height());
+        coordBox = QRect(r.width() - 1 - fm.horizontalAdvance(coord), yDraw + 2, fm.horizontalAdvance(coord) + 1, fm.height());
         p.fillRect(coordBox, blackBrush);
         coordBox.setX(coordBox.x() + 1);
         p.drawText(coordBox, coord);
@@ -1025,7 +1022,7 @@ void ImageWindow::drawColorbar()
 
     QString title;
     title = getColormapName();
-    QString dipFactorString = QString().asprintf("%0.03f", dipFactor);
+    QString dipFactorString = QString::asprintf("%0.03f", dipFactor);
     if (getImageFunction() == ImageWindowFunction::Log10DarkenLight)
         title.append(" log darken (" + dipFactorString + ")");
     else if (getImageFunction() == ImageWindowFunction::Log10BrightenDark)
@@ -1037,16 +1034,14 @@ void ImageWindow::drawColorbar()
     if (getScaleMode() == ImageWindowScaling::Fit)
         title.append(" fit");
 
-    QString minTxt;
-    minTxt.sprintf("%.1f", scaleMin);
+    QString minTxt = QString::asprintf("%.1f", scaleMin);
 
-    QString maxTxt;
-    maxTxt.sprintf("%.1f", scaleMax);
+    QString maxTxt = QString::asprintf("%.1f", scaleMax);
 
     QFontMetrics fm(windowFont);
     int textH = fm.height();
     int barWidth = 255;
-    while (fm.width(title) + fm.width(minTxt) + fm.width(maxTxt) + 50 > barWidth)
+    while (fm.horizontalAdvance(title) + fm.horizontalAdvance(minTxt) + fm.horizontalAdvance(maxTxt) + 50 > barWidth)
         barWidth += 256;
     int barHeight = 10;
 
@@ -1089,9 +1084,9 @@ void ImageWindow::drawColorbar()
         p.setPen(Qt::white);
 
         p.drawText(boxMargin, boxMargin + textH, minTxt);
-        p.drawText(colorbarImage.width() - boxMargin - fm.width(maxTxt), boxMargin + textH, maxTxt);
+        p.drawText(colorbarImage.width() - boxMargin - fm.horizontalAdvance(maxTxt), boxMargin + textH, maxTxt);
 
-        p.drawText(colorbarImage.width() / 2 - fm.width(title) / 2, boxMargin + textH, title);
+        p.drawText(colorbarImage.width() / 2 - fm.horizontalAdvance(title) / 2, boxMargin + textH, title);
 
         translationIsFresh = false;
     }
@@ -1174,13 +1169,12 @@ void ImageWindow::drawROI()
     QBrush blackBrush(Qt::black);
     p.setFont(windowFont);
 
-    QString coords;
-    coords.sprintf("dx = %d, dy = %d -> h = %.2f", ROI.width(), ROI.height(),
-                sqrt((double)(ROI.width() * ROI.width() + ROI.height() * ROI.height())));
+    QString coords = QString::asprintf("dx = %d, dy = %d -> h = %.2f", ROI.width(), ROI.height(),
+                                       sqrt((double)(ROI.width() * ROI.width() + ROI.height() * ROI.height())));
     QFontMetrics fm(windowFont);
-    QRect coordBox((ROI1Screen.x() + ROI2Screen.x() - fm.width(coords)) / 2,
+    QRect coordBox((ROI1Screen.x() + ROI2Screen.x() - fm.horizontalAdvance(coords)) / 2,
                 (ROI1Screen.y() + ROI2Screen.y() - fm.height()) / 2,
-                fm.width(coords) + 1, fm.height());
+                fm.horizontalAdvance(coords) + 1, fm.height());
     p.fillRect(coordBox, blackBrush);
     coordBox.setX(coordBox.x() + 1);
     p.drawText(coordBox, coords);
@@ -1189,8 +1183,6 @@ void ImageWindow::drawROI()
 #include <QApplication>
 void ImageWindow::snapWindowTo(snapType snap, int screenNum)
 {
-    QDesktopWidget * desktop = QApplication::desktop();
-    QRect screenDims;
     int halfBorder = (frameGeometry().width()  - geometry().width() )/2; // thickness of window border.
 
     //This does not directly support vertical screen layout, i.e. one monitor above another.
@@ -1204,6 +1196,8 @@ void ImageWindow::snapWindowTo(snapType snap, int screenNum)
 
     //We need to establish on our own the screen layout for left-to-right, because Qt doesn't
     //seem to handle that very well.
+    QDesktopWidget * desktop = QApplication::desktop();
+    QRect screenDims;
     int numScreens = desktop->numScreens();
     int screensL2R[numScreens];
     memset(screensL2R, -1, numScreens * sizeof(int));
@@ -1876,7 +1870,7 @@ void ImageWindow::keyPressEvent(QKeyEvent *event)
     handleKeyPress(event, false);
 }
 
-void ImageWindow::handleKeyRelease(QKeyEvent *event, bool forwarded)
+void ImageWindow::handleKeyRelease(QKeyEvent *event, bool /*forwarded*/)
 {
     if(showHelp)
     {
@@ -1908,7 +1902,7 @@ void ImageWindow::drawHelp()
 
     menu.append("pxlpeep version ");
     menu.append(VERSION_STRING);
-    int width = fm.width("Left button                        select ROI"); // example line
+    int width = fm.horizontalAdvance("Left button                        select ROI"); // example line
     menu.append("\n");
     int numLines = 1;
     menu.append("\n");                                   numLines++;
