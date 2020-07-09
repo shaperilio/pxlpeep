@@ -1846,15 +1846,9 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         case Qt::Key_Control:
         case Qt::Key_Alt:
         case Qt::Key_Meta: // control key on Mac
-            break;
+            break; //don't show help for all the aux keys by themselves
         default:
         {
-            if (mods | Qt::ControlModifier ||
-                mods | Qt::AltModifier ||
-                mods | Qt::ShiftModifier ||
-                mods | Qt::MetaModifier
-               )
-                break; //don't show help for all the aux keys.
             cout << "Default key press case." << endl;
             showHelp = true;
             viewport()->update();
