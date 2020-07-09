@@ -13,6 +13,7 @@
 using namespace std;
 
 #define NOT_LOADED "not loaded"
+#define DEFAULT_DATE QDateTime::fromString("1980-01-16 08:00:00", "yyyy-MM-dd hh:mm:ss")
 
 ImageWindow::ImageWindow(Colormapper &map, int ID)
 {
@@ -64,6 +65,7 @@ ImageWindow::ImageWindow(Colormapper &map, int ID)
     for (int i = 0; i < IMAGE_BUFFER_LENGTH; i++) {
         sourceImageBuffer[i] = nullptr;
         sourceImageBufferFilenames[i] = NOT_LOADED;
+        sourceImageBufferModifiedDate[i] = DEFAULT_DATE;
     }
     scene = nullptr;
     colormap = &map;
@@ -88,7 +90,8 @@ void ImageWindow::reportBufferContents()
 {
     for (int i = 0; i < IMAGE_BUFFER_LENGTH; i++) {
         if (sourceImageBufferFilenames[i] == NOT_LOADED) continue;
-        cout << "Image buffer slot " << i << ": " << sourceImageBufferFilenames[i].toStdString() << endl;
+        cout << "Image buffer slot " << i << ": " << sourceImageBufferFilenames[i].toStdString() <<
+                " modified at " << sourceImageBufferModifiedDate[i].toString("yyyy-MM-dd hh:mm:ss").toStdString() << endl;
     }
 }
 
@@ -104,8 +107,7 @@ bool ImageWindow::readImage(QString filename)
     if (filename == "")
         return false;
 
-    QFileInfo fileInfo(filename);
-    filename = fileInfo.canonicalFilePath();
+    filename = QFileInfo(filename).canonicalFilePath();
 
     reportBufferContents();
 
@@ -124,6 +126,7 @@ bool ImageWindow::readImage(QString filename)
             delete sourceImageBuffer[sourceImageBufferIndex];
             sourceImageBuffer[sourceImageBufferIndex] = nullptr;
             sourceImageBufferFilenames[sourceImageBufferIndex] = NOT_LOADED;
+            sourceImageBufferModifiedDate[sourceImageBufferIndex] = DEFAULT_DATE;
         }
         cout << "Image `" << filename.toStdString() << "` not buffered; loading from disk." << endl;
         currentImageBufferIndex = sourceImageBufferIndex;
@@ -131,14 +134,23 @@ bool ImageWindow::readImage(QString filename)
         // This image is in our buffer; we're done!
         currentImageBufferIndex = idx;
         cout << "Image `" << filename.toStdString() << "` found at buffer position " << idx << "." << endl;
-        curFilename = filename;
-        sourceImageBufferFilenames[currentImageBufferIndex] = curFilename;
+        // But has it been modified?
+        if (QFileInfo(filename).lastModified().toMSecsSinceEpoch() != sourceImageBufferModifiedDate[idx].toMSecsSinceEpoch()) {
+            cout << "Image `" << filename.toStdString() << "` has been modified on disk. Reloading." << endl;
+            currentImageBufferIndex = idx;
+        }
+        else {
+            // Repeat all the code from below which executes after loading the image from disk.
+            curFilename = filename;
+            sourceImageBufferFilenames[currentImageBufferIndex] = curFilename;
+            sourceImageBufferModifiedDate[currentImageBufferIndex] = QFileInfo(curFilename).lastModified();
 
-        int lastSlash = curFilename.lastIndexOf('/');
-        curDirectory = curFilename.left(lastSlash + 1);
-        syncWithFolder();
-        setTitle(filename);
-        return translateImage();
+            int lastSlash = curFilename.lastIndexOf('/');
+            curDirectory = curFilename.left(lastSlash + 1);
+            syncWithFolder();
+            setTitle(filename);
+            return translateImage();
+        }
     }
 
     curFilename = "";
@@ -163,6 +175,7 @@ bool ImageWindow::readImage(QString filename)
 
     curFilename = filename;
     sourceImageBufferFilenames[currentImageBufferIndex] = curFilename;
+    sourceImageBufferModifiedDate[currentImageBufferIndex] = QFileInfo(curFilename).lastModified();
 
     int lastSlash = curFilename.lastIndexOf('/');
     curDirectory = curFilename.left(lastSlash + 1);

@@ -2,6 +2,7 @@
 #define IMAGEWINDOW_H
 
 #include <QGraphicsView>
+#include <QDateTime>
 #include "ImageData.h"
 #include "colormapper.h"
 #include "MainDialog.h"
@@ -138,6 +139,7 @@ protected:
     static constexpr int IMAGE_BUFFER_LENGTH = 10;
     ImageData *sourceImageBuffer[IMAGE_BUFFER_LENGTH];
     QString sourceImageBufferFilenames[IMAGE_BUFFER_LENGTH];
+    QDateTime sourceImageBufferModifiedDate[IMAGE_BUFFER_LENGTH];
     int sourceImageBufferIndex = 0;  // Stores the next available slot in the buffer.
     int currentImageBufferIndex = 0; // Stores the slot that we're currently looking at.
     void reportBufferContents();
