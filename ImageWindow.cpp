@@ -1535,10 +1535,43 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
 
     switch(event->key())
     {
+        // The digits 0-9 are used for sorting images into "bucket folders".
+        // We let all these cases continue on to the end, where they're handled
+        // in the case statement for Key_2.
+        case Qt::Key_3:
+        case Qt::Key_4:
+        case Qt::Key_5:
+        case Qt::Key_6:
+        case Qt::Key_7:
+        case Qt::Key_8:
+        case Qt::Key_9:
+        case Qt::Key_0:
+        {
+            if (mods == Qt::NoModifier) {
+                imgIsZeroIndexed = !imgIsZeroIndexed;
+                drawRulers();
+                viewport()->update();
+                break;
+            }
+        }
         case Qt::Key_1:
         {
-            if (mods == Qt::ControlModifier)
+            if (event->key() == Qt::Key_1 && mods == Qt::ControlModifier) {
                 zoomFit();
+                break;
+            }
+        }
+        case Qt::Key_2:
+        {
+            if (event->key() == Qt::Key_2 && mods == Qt::ControlModifier) {
+                zoom1To1();
+                break;
+            }
+
+            if (mods == Qt::MetaModifier) {
+                int bucket = static_cast<int>(event->key()) - 0x30;
+                copyCurrentFileToBucket(bucket);
+            }
             break;
         }
         case Qt::Key_M:
@@ -1548,12 +1581,6 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                     parent->raise();
                 }
             }
-            break;
-        }
-        case Qt::Key_2:
-        {
-            if (mods == Qt::ControlModifier)
-                zoom1To1();
             break;
         }
         case Qt::Key_Left:
@@ -1838,15 +1865,6 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             translateImage();
             break;
         }
-        case Qt::Key_0:
-        {
-            if (mods != Qt::NoModifier) break;
-
-            imgIsZeroIndexed = !imgIsZeroIndexed;
-            drawRulers();
-            viewport()->update();
-            break;
-        }
         case Qt::Key_Y:
         {
             if (mods != Qt::NoModifier) break;
@@ -1941,6 +1959,7 @@ void ImageWindow::drawHelp()
     menu.append("rt arrow                           next image\n"); numLines++;
     menu.append("F5 or CTRL+R                     reload image\n"); numLines++;
     menu.append("Del                    delete image from disk\n"); numLines++;
+    menu.append("ALT+[0-9]          move image to bucket [0-9]\n"); numLines++;
     menu.append("\n"); numLines++;
     menu.append("CTRL+1                            zoom to fit\n"); numLines++;
     menu.append("CTRL+2                               zoom 1:1\n"); numLines++;
@@ -2086,13 +2105,50 @@ bool ImageWindow::deleteCurrentFile()
     filename = curDir.filePath(filename);
 
     QFile file(curFilename);
-    if(file.rename(filename))
+    if(file.rename(filename)) {
         cout << "Moved " << curFilename.toStdString() << " to " << filename.toStdString() << endl;
-    else
+        emit signalFileDeleted(filename);
+        return true;
+    }
+    else {
         cerr << "Failed to move " << curFilename.toStdString() << " to " << filename.toStdString() << endl;
+        return false;
+    }
+}
 
-    emit signalFileDeleted(filename);
-    return true;
+// Copies the file to a sub-folder with the name "pxlpeep_bucket_<bucket>"
+bool ImageWindow::copyCurrentFileToBucket(int bucket)
+{
+    if (bucket < 0 || bucket > 9) {
+        cerr << "Invalid bucket '" << bucket << "' for marking image; should be between 0 and 9, inclusive." << endl;
+        return false;
+    }
+
+    QString folder, filename;
+    QFileInfo fi(curFilename);
+    folder = fi.absoluteDir().path();
+    filename = fi.fileName();
+    folder = QDir(folder).filePath(QString("pxlpeep_bucket_%1").arg(bucket));
+    QDir curDir(folder);
+    if (!curDir.exists())
+    {
+        if (!QDir().mkdir(folder))
+        {
+            cerr << "Failed to create sorting bucket folder at " << folder.toStdString() << endl;
+            return false;
+        }
+    }
+    filename = curDir.filePath(filename);
+
+    QFile file(curFilename);
+    if(file.copy(filename)) {
+        cout << "Copied " << curFilename.toStdString() << " to " << filename.toStdString() << endl;
+        return true;
+    }
+    else {
+        cerr << "Failed to copy " << curFilename.toStdString() << " to " << filename.toStdString() << endl;
+        return false;
+    }
 }
 
 void ImageWindow::showWindow()

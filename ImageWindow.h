@@ -246,6 +246,8 @@ protected:
     int fileListPos;
     bool deleteCurrentFile();
 
+    bool copyCurrentFileToBucket(int bucket);
+
     void copyImageToClipboard();
     void saveImageToFile();
     bool takeScreenshot(QImage &screenshot);
