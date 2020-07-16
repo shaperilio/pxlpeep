@@ -825,16 +825,29 @@ void ImageWindow::drawInfoBox()
                                       sourceImage->getWidth(), sourceImage->getHeight(), zoomFactor);
 
     QString rot;
+    int w, h;
     switch (rotation)
     {
     case ImageWindowRotation::Zero:
-        rot = ""; break;
+        rot = "";
+        w = sourceImage->getWidth();
+        h = sourceImage->getHeight();
+        break;
     case ImageWindowRotation::CCW90:
-        rot = " 90deg"; break;
+        rot = " 90deg";
+        h = sourceImage->getWidth();
+        w = sourceImage->getHeight();
+        break;
     case ImageWindowRotation::CCW180:
-        rot = " 180deg"; break;
+        rot = " 180deg";
+        w = sourceImage->getWidth();
+        h = sourceImage->getHeight();
+        break;
     case ImageWindowRotation::CCW270:
-        rot = " 270deg"; break;
+        rot = " 270deg";
+        h = sourceImage->getWidth();
+        w = sourceImage->getHeight();
+        break;
     }
     line2.append(rot);
     if (flipHorizontal && !flipVertical)
@@ -869,7 +882,12 @@ void ImageWindow::drawInfoBox()
 
     curX = zoomedPos.x() + (imgIsZeroIndexed ? 0 : 1) - 0.5;
 
-    line4 = QString::asprintf("X = %.1f, Y = %.1f", curX, curY);
+    double rX = curX - (imgIsZeroIndexed ? 0 : 1) - static_cast<double>(w)/2;
+    double rY = curY - (imgIsZeroIndexed ? 0 : 1) - static_cast<double>(h)/2;
+    double curR = sqrtf(rX*rX + rY*rY);
+    double curTheta = atan2(rY, rX) * 180 / M_PI;
+
+    line4 = QString::asprintf("X = %.1f, Y = %.1f (R = %.1f, θ = %.1f)", curX, curY, curR, curTheta);
 
     QString colorVal;
     if (zoomedPos.x() > 0 && zoomedPos.x() < sourceImage->getWidth() &&
