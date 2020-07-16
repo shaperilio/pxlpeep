@@ -53,6 +53,8 @@ public:
         scaling = ImageWindowScaling::User;
         function = ImageWindowFunction::OneToOne;
         rotation = ImageWindowRotation::Zero;
+        flipHorizontal = false;
+        flipVertical   = false;
 
         activeChannels = chanR | chanG | chanB;
 
@@ -77,12 +79,15 @@ public:
     ImageWindowScaling  getScaleMode()     {return scaling; }
     ImageWindowFunction getImageFunction() {return function;}
     ImageWindowRotation getImageRotation() {return rotation;}
+    bool getImageFlipHorizontal() {return flipHorizontal;}
+    bool getImageFlipVertical()   {return flipVertical;}
 
     bool setUserMin(double newMin);
     bool setUserMax(double newMax);
     bool setScaleMode(ImageWindowScaling newMode);
     bool setImageFunction(ImageWindowFunction newFunction);
     bool setImageRotation(ImageWindowRotation newRotation);
+    bool setImageFlip(bool horizontal, bool vertical);
     int  getImageWidth();
     int  getImageHeight(); //these return the dimensions according to rotation.
 
@@ -162,6 +167,8 @@ protected:
     inline double imageFunctionDarkenLight(double value);
     inline double imageFunctionNone(double value);
     ImageWindowRotation rotation;
+
+    bool flipHorizontal, flipVertical;
 
     static const uchar chanR = 1;
     static const uchar chanG = 2;

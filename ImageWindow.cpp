@@ -247,6 +247,16 @@ bool ImageWindow::setImageRotation(ImageWindowRotation newRotation)
     return translateImage();
 }
 
+bool ImageWindow::setImageFlip(bool horizontal, bool vertical)
+{
+    if (horizontal == getImageFlipHorizontal() && vertical == getImageFlipVertical())
+        return true;
+    flipHorizontal = horizontal;
+    flipVertical   = vertical;
+    cout << "Flip H: " << flipHorizontal << "; flip V: " << flipVertical << endl;
+    return translateImage();
+}
+
 int ImageWindow::getImageWidth()
 {
     auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
@@ -396,22 +406,55 @@ bool ImageWindow::translateImage()
             {
                 int srcIdx = r * w + c; //source pixel index
                 int dstIdx; //destination pixel index; depends on rotation
+
                 switch(rotation)
                 {
-                case ImageWindowRotation::Zero:
-                    dstIdx = (r * w + c) * 4;
-                    break;
-                case ImageWindowRotation::CCW90:
-                    dstIdx = (c * h + (h - 1 - r)) * 4;
-                    dstIdx = (h * w - 1) * 4 - dstIdx;
-                    break;
-                case ImageWindowRotation::CCW180:
-                    dstIdx = (r * w + c) * 4;
-                    dstIdx = (h * w - 1) * 4 - dstIdx;
-                    break;
-                case ImageWindowRotation::CCW270:
-                    dstIdx = (c * h + (h - 1 - r)) * 4;
-                    break;
+                    case ImageWindowRotation::Zero:
+                    {
+                        int c2 = c;
+                        int r2 = r;
+                        if (flipHorizontal)
+                            c2 = w - 1 - c;
+                        if (flipVertical)
+                            r2 = h - 1 - r;
+                        dstIdx = (r2 * w + c2) * 4;
+                        break;
+                    }
+                    case ImageWindowRotation::CCW90:
+                    {
+                        int c2 = c;
+                        int r2 = (h - 1 - r);
+                        if (flipHorizontal)
+                            r2 = r;
+                        if (flipVertical)
+                            c2 = w - 1 - c;
+                        dstIdx = (c2 * h + r2) * 4;
+                        dstIdx = (h * w - 1) * 4 - dstIdx;
+                        break;
+                    }
+                    case ImageWindowRotation::CCW180:
+                    {
+                        int c2 = c;
+                        int r2 = r;
+                        if (flipHorizontal)
+                            c2 = w - 1 - c;
+                        if (flipVertical)
+                            r2 = h - 1 - r;
+                        dstIdx = (r2 * w + c2) * 4;
+                        dstIdx = (h * w - 1) * 4 - dstIdx;
+                        break;
+                    }
+                    case ImageWindowRotation::CCW270:
+                    {
+                        int c2 = c;
+                        int r2 = (h - 1 - r);
+                        if (flipHorizontal)
+                            r2 = r;
+                        if (flipVertical)
+                            c2 = w - 1 - c;
+                        dstIdx = (c2 * h + r2) * 4;
+                        break;
+                    }
                 }
                 double srcPixel = (applyImageFunction(sourceImage->getPixel(srcIdx, channel)) - offset) * scale;
                 const uchar *dstPixel = translatedImage.constBits() + dstIdx;
@@ -427,22 +470,55 @@ bool ImageWindow::translateImage()
             {
                 int srcIdx = r * w + c; //source pixel index
                 int dstIdx; //destination pixel index; depends on rotation
+
                 switch(rotation)
                 {
-                case ImageWindowRotation::Zero:
-                    dstIdx = (r * w + c) * 4;
-                    break;
-                case ImageWindowRotation::CCW90:
-                    dstIdx = (c * h + (h - 1 - r)) * 4;
-                    dstIdx = (h * w - 1) * 4 - dstIdx;
-                    break;
-                case ImageWindowRotation::CCW180:
-                    dstIdx = (r * w + c) * 4;
-                    dstIdx = (h * w - 1) * 4 - dstIdx;
-                    break;
-                case ImageWindowRotation::CCW270:
-                    dstIdx = (c * h + (h - 1 - r)) * 4;
-                    break;
+                    case ImageWindowRotation::Zero:
+                    {
+                        int c2 = c;
+                        int r2 = r;
+                        if (flipHorizontal)
+                            c2 = w - 1 - c;
+                        if (flipVertical)
+                            r2 = h - 1 - r;
+                        dstIdx = (r2 * w + c2) * 4;
+                        break;
+                    }
+                    case ImageWindowRotation::CCW90:
+                    {
+                        int c2 = c;
+                        int r2 = (h - 1 - r);
+                        if (flipHorizontal)
+                            r2 = r;
+                        if (flipVertical)
+                            c2 = w - 1 - c;
+                        dstIdx = (c2 * h + r2) * 4;
+                        dstIdx = (h * w - 1) * 4 - dstIdx;
+                        break;
+                    }
+                    case ImageWindowRotation::CCW180:
+                    {
+                        int c2 = c;
+                        int r2 = r;
+                        if (flipHorizontal)
+                            c2 = w - 1 - c;
+                        if (flipVertical)
+                            r2 = h - 1 - r;
+                        dstIdx = (r2 * w + c2) * 4;
+                        dstIdx = (h * w - 1) * 4 - dstIdx;
+                        break;
+                    }
+                    case ImageWindowRotation::CCW270:
+                    {
+                        int c2 = c;
+                        int r2 = (h - 1 - r);
+                        if (flipHorizontal)
+                            r2 = r;
+                        if (flipVertical)
+                            c2 = w - 1 - c;
+                        dstIdx = (c2 * h + r2) * 4;
+                        break;
+                    }
                 }
 
                 double srcPixel0 = (activeChannels & chanR ? (applyImageFunction(sourceImage->getPixel(srcIdx, 0)) - offset) * scale : 0);
@@ -761,6 +837,12 @@ void ImageWindow::drawInfoBox()
         rot = " 270deg"; break;
     }
     line2.append(rot);
+    if (flipHorizontal && !flipVertical)
+        line2.append(" H flip");
+    if (!flipHorizontal && flipVertical)
+        line2.append(" V flip");
+    if (flipHorizontal && flipVertical)
+        line2.append(" H+V flip");
 
     QString line3;
     bool line3Valid = false;
@@ -1832,6 +1914,22 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
 
             break;
         }
+        case Qt::Key_L:
+        {
+            if (mods != Qt::NoModifier) break;
+            bool h = !getImageFlipHorizontal();
+            bool v = getImageFlipVertical();
+            setImageFlip(h, v);
+            break;
+        }
+        case Qt::Key_T:
+        {
+            if (mods != Qt::NoModifier) break;
+            bool h = getImageFlipHorizontal();
+            bool v = !getImageFlipVertical();
+            setImageFlip(h, v);
+            break;
+        }
         case Qt::Key_R:
         {
             if (mods == Qt::ControlModifier && !forwarded)
@@ -1975,6 +2073,8 @@ void ImageWindow::drawHelp()
     menu.append("W                   compute ROI white balance\n"); numLines++;
     menu.append("SHIFT+W                   reset white balance\n"); numLines++;
     menu.append("A / SHIFT+A               rotate image 90 deg\n"); numLines++;
+    menu.append("L                      toggle flip horizontal\n"); numLines++;
+    menu.append("T                        toggle flip vertical\n"); numLines++;
     menu.append("R                          toggle red channel\n"); numLines++;
     menu.append("SHIFT+R                      red channel only\n"); numLines++;
     menu.append("G                        toggle greem channel\n"); numLines++;
