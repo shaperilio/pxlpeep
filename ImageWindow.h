@@ -39,7 +39,7 @@ class ImageWindow : public QGraphicsView
     Q_OBJECT
 
 public:
-    ImageWindow(Colormapper &map, int ID);
+    ImageWindow(int ID);
 
     bool readImage(QString filename);
 

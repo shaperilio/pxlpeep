@@ -49,8 +49,6 @@ protected:
     QPushButton *imgButtons[MAX_BUTTONS];
     ImageWindow *imgWindows[MAX_BUTTONS];
 
-    Colormapper colormap; //one colormapper for all the windows to share.
-
     //These functions set and get the last used directory and type using the registry.
     const QString KEY_LAST_USED_DIR = "last_used_dir";
     void     storeLastOpenFrom(QString filepath);

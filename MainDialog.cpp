@@ -263,7 +263,7 @@ void MainDialog::openAndShow(int windowID, QString filename)
     else
         ID = windowID;
 
-    if (imgWindows[ID] == nullptr) imgWindows[ID] = new ImageWindow(colormap, ID);
+    if (imgWindows[ID] == nullptr) imgWindows[ID] = new ImageWindow(ID);
 
     imgWindow = imgWindows[ID];
     imgWindow->myButtonNo = ID;
@@ -315,7 +315,7 @@ void MainDialog::openAndPaste(int windowID)
     else
         ID = windowID;
 
-    if (imgWindows[ID] == nullptr) imgWindows[ID] = new ImageWindow(colormap, ID);
+    if (imgWindows[ID] == nullptr) imgWindows[ID] = new ImageWindow(ID);
 
     imgWindow = imgWindows[ID];
     imgWindow->myButtonNo = ID;

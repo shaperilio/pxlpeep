@@ -15,7 +15,7 @@ using namespace std;
 #define NOT_LOADED "not loaded"
 #define DEFAULT_DATE QDateTime::fromString("1980-01-16 08:00:00", "yyyy-MM-dd hh:mm:ss")
 
-ImageWindow::ImageWindow(Colormapper &map, int ID)
+ImageWindow::ImageWindow(int ID)
 {
     this->ID = ID;
     holdAll();
@@ -68,7 +68,7 @@ ImageWindow::ImageWindow(Colormapper &map, int ID)
         sourceImageBufferModifiedDate[i] = DEFAULT_DATE;
     }
     scene = nullptr;
-    colormap = &map;
+    colormap = new Colormapper();
     dipFactor = 1;
  }
 
@@ -321,8 +321,6 @@ bool ImageWindow::getTranslationParamsString(QString &params)
 
 bool ImageWindow::translateImage()
 {
-    cout << "Translating image; dipFactor = " << this->dipFactor << endl;
-
     if (colormap == nullptr)
         return false;
 
@@ -1627,9 +1625,9 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
 {
     Qt::KeyboardModifiers mods = QApplication::keyboardModifiers();
 
-    cout << std::hex;
-    cout << "Key press: 0x" << event->key() << " with modifier 0x" << mods << endl;
-    cout << std::dec;
+//    cout << std::hex;
+//    cout << "Key press: 0x" << event->key() << " with modifier 0x" << mods << endl;
+//    cout << std::dec;
 
     auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
 
