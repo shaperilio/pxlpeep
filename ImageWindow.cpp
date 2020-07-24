@@ -1900,6 +1900,9 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         }
         case Qt::Key_W:
         {
+            if (forwarded)
+                break;
+
             if (mods == Qt::ControlModifier) {
                 this->close();
                 break;
