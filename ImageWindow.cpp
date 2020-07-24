@@ -189,7 +189,6 @@ bool ImageWindow::readImage(QString filename)
 
 bool ImageWindow::setColormap(ColormapPalette newColormap)
 {
-    if (colormap == nullptr) return false;
     if (newColormap == getColormap()) return true;
     if (!colormap->setColormap(newColormap)) return false;
     return translateImage();
@@ -281,12 +280,6 @@ int ImageWindow::getImageHeight()
 
 bool ImageWindow::getTranslationParamsString(QString &params)
 {
-    if (colormap == nullptr)
-    {
-        cerr << "Attempt to get translation parameters when colormap is null!" << endl;
-        return false;
-    }
-
     if (!OKToTranslate)
     {
         cerr << "Attempt to get translation parameters when image is not OK to translate!" << endl;
@@ -321,9 +314,6 @@ bool ImageWindow::getTranslationParamsString(QString &params)
 
 bool ImageWindow::translateImage()
 {
-    if (colormap == nullptr)
-        return false;
-
     if (!OKToTranslate)
         return true;
 
@@ -766,12 +756,20 @@ inline double ImageWindow::applyImageFunction(double value)
 
 inline double ImageWindow::imageFunctionLog10BrightenDark(double value)
 {
-    if (value > 0) return log10(value * dipFactor * dipFactor); else return 0;
+    if (value > 0) {
+        double val = log10(value * dipFactor * dipFactor);
+        if (val > 0) return val;
+    }
+    return 0;
 }
 
 inline double ImageWindow::imageFunctionLog10DarkenLight(double value)
 {
-    if (value > 0) return log10(value / dipFactor / dipFactor); else return 0;
+    if (value > 0) {
+        double val = log10(value / dipFactor / dipFactor);
+        if (val > 0) return val;
+    }
+    return 0;
 }
 
 inline double ImageWindow::imageFunctionNone(double value)
@@ -796,7 +794,10 @@ inline double ImageWindow::imageFunctionBrightenDark(double value)
     auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
     double maxVal = sourceImage->getMaxValue();
     double minVal = sourceImage->getMinValue();
-    return parabolicResponse(value, minVal, maxVal, dipFactor);
+    double val = parabolicResponse(value, minVal, maxVal, dipFactor);
+    if (val > maxVal) return maxVal;
+    if (val < minVal) return minVal;
+    return val;
 }
 
 inline double ImageWindow::imageFunctionDarkenLight(double value)
@@ -804,7 +805,10 @@ inline double ImageWindow::imageFunctionDarkenLight(double value)
     auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
     double maxVal = sourceImage->getMaxValue();
     double minVal = sourceImage->getMinValue();
-    return parabolicResponse(value, minVal, maxVal, 1/dipFactor);
+    double val = parabolicResponse(value, minVal, maxVal, 1/dipFactor);
+    if (val > maxVal) return maxVal;
+    if (val < minVal) return minVal;
+    return val;
 }
 
 void ImageWindow::drawInfoBox()
