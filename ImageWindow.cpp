@@ -978,22 +978,25 @@ void ImageWindow::drawInfoBox()
 
     p.setPen(Qt::white);
     p.setFont(windowFont);
-    QRect lineRect = infoRect;
-    lineRect.setX(lineRect.x() + boxMargin);
+    QRect lineRect(infoRect.x(), infoRect.y(), infoRect.width()*2, infoRect.height()*2);
 
+    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line1) - boxMargin);
     lineRect.setY(lineRect.y() + boxMargin);
     p.drawText(lineRect, line1);
 
+    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line2) - boxMargin);
     lineRect.setY(lineRect.y() + lineVspace + lineH);
     p.drawText(lineRect, line2);
 
     if (line3Valid)
     {
+        lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line3) - boxMargin);
         lineRect.setY(lineRect.y() + lineVspace + lineH);
         p.drawText(lineRect, line3);
     }
 
-    lineRect.setY(lineRect.y() + lineVspace + lineH);
+    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line4) - boxMargin);
+    lineRect.setY(lineRect.y() + lineVspace + lineH - 2);
     p.drawText(lineRect, line4);
 }
 
