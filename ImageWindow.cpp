@@ -1552,6 +1552,7 @@ void ImageWindow::saveImageToFile()
 #include <QScreen>
 #include <QWindow>
 #include <QPixmap>
+#include <QSysInfo>
 bool ImageWindow::takeScreenshot(QImage &screenshot)
 {
     if (!OKToDraw)
@@ -1574,7 +1575,20 @@ bool ImageWindow::takeScreenshot(QImage &screenshot)
         return false;
     }
 
-    QPixmap pixmap = screen->grabWindow(window->winId());
+    int x = 0, y = 0, w = -1, h = -1;
+    QString os = QSysInfo::productType();
+    cout << "Taking a screenshot on " << os.toStdString() << endl;
+    if (os == "macos" || os == "osx")
+    {
+        // For mac, we have to define the coordinates of the screenshot.
+        x = this->geometry().x();
+        y = this->geometry().y();
+        w = this->geometry().width();
+        h = this->geometry().height();
+        cout << "OS X screenshot at " << x << ", " << y << " measuring " << w << " x " << h << "." << endl;
+    }
+
+    QPixmap pixmap = screen->grabWindow(window->winId(), x, y, w, h);
     screenshot = pixmap.toImage();
     return true;
 }
