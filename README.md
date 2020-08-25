@@ -37,6 +37,10 @@ If on a clean OS, you may need to install `make` and `openMP` as well:
 
 ```
 sudo apt install build-essential libomp-dev
+Note that to execute pxlpeep, if you installed Qt from their installer, you need to point it to the correct libraries directory, which by default is in your home folder:
+
+```
+LD_LIBRARY_PATH=~/Qt/5.15.0/gcc_64/lib/ ./pxlpeep
 ```
 
 ## Building MacOS Catalina

@@ -7,6 +7,9 @@
 QT += core gui
 QT += opengl
 
+# Statically link qt components so that we don't get weird errors when trying to load platform plugins.
+CONFIG += qt static
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = pxlpeep
