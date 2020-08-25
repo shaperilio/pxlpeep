@@ -33,6 +33,12 @@ It also requires OpenGL, which Qt seems to include but somehow not link correctl
 sudo apt install freeglut3-dev
 ```
 
+If on a clean OS, you may need to install `make` and `openMP` as well:
+
+```
+sudo apt install build-essential libomp-dev
+```
+
 ## Building MacOS Catalina
 You have to install OpenMP.
 
