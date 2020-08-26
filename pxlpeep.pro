@@ -7,9 +7,6 @@
 QT += core gui
 QT += opengl
 
-# Statically link qt components so that we don't get weird errors when trying to load platform plugins.
-CONFIG += qt static
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = pxlpeep
@@ -41,6 +38,10 @@ CONFIG(debug, release|debug):DEFINES += _DEBUG
 unix:!macx {
     QMAKE_CXXFLAGS += -fopenmp
     LIBS += -fopenmp -lfreeimage
+
+    # Statically link qt components so that we don't get weird errors when trying to load platform plugins.
+    # Doesn't work on Mac.
+    CONFIG += qt static
 }
 
 # For Catalina:
