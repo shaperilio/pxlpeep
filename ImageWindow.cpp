@@ -41,7 +41,7 @@ ImageWindow::ImageWindow(int ID)
     int id = QFontDatabase::addApplicationFont(":/fonts/ProFontWindows.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     windowFont = QFont(family);
-    windowFont.setPixelSize(12);
+    windowFont.setPointSize(8);
 #ifdef Q_OS_MACOS
     // If we do a titleless window on Mac, you can't resize the window.
     // Tool windows have a smaller titlebar but they are always on top of the main window.
@@ -1004,7 +1004,7 @@ void ImageWindow::drawRulers()
 {
     if (!showRulers) return;
 
-    int minTickSpacingpix = 50;
+    int minTickSpacingpix = 100;
     int tickLen = 15;
 
     QFontMetrics fm(windowFont);
