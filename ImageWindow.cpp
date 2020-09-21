@@ -41,13 +41,14 @@ ImageWindow::ImageWindow(int ID)
     int id = QFontDatabase::addApplicationFont(":/fonts/ProFontWindows.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     windowFont = QFont(family);
-    windowFont.setPointSize(8);
 #ifdef Q_OS_MACOS
     // If we do a titleless window on Mac, you can't resize the window.
     // Tool windows have a smaller titlebar but they are always on top of the main window.
 //    setWindowFlags(Qt::Tool);
 //    setAttribute(Qt::WA_MacAlwaysShowToolWindow); // so it doesn't disappear when we lose focus.
+    windowFont.setPointSize(11);
 #else
+    windowFont.setPointSize(8);
     setWindowFlags(Qt::CustomizeWindowHint); //sizeable border without title bar.
 #endif
     //The update mode is important because we will draw on top of the image things that
