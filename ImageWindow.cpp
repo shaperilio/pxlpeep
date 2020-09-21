@@ -684,9 +684,43 @@ void ImageWindow::zoomFit()
 
 void ImageWindow::showCentered()
 {
-    // This will only properly center the image if it has been translated.
-    horizontalScrollBar()->setValue((horizontalScrollBar()->maximum() + horizontalScrollBar()->minimum()) / 2);
-    verticalScrollBar()->  setValue((verticalScrollBar()->  maximum() + verticalScrollBar()->  minimum()) / 2);
+    showCorner(ImageCorner::Center);
+}
+
+void ImageWindow::showCorner(ImageCorner corner)
+{
+    // This will only properly move the image if it has been translated.
+    auto hScroll = horizontalScrollBar();
+    auto vScroll = verticalScrollBar();
+
+    // We go 5% of the minimum window dimension beyond the edges of images to accentuate the fact you're at a corner.
+    double edgeMargin = 0.05 * min(width(), height());
+
+    if (corner == ImageCorner::Center) {
+        hScroll->setValue((hScroll->maximum() + hScroll->minimum()) / 2);
+        vScroll->setValue((vScroll->maximum() + vScroll->minimum()) / 2);
+        return;
+    }
+    if (corner == ImageCorner::TopLeft) {
+        hScroll->setValue(-edgeMargin);
+        vScroll->setValue(-edgeMargin);
+        return;
+    }
+    if (corner == ImageCorner::BottomLeft) {
+        hScroll->setValue(-edgeMargin);
+        vScroll->setValue(getImageHeight() * zoomFactor + edgeMargin - height());
+        return;
+    }
+    if (corner == ImageCorner::TopRight) {
+        hScroll->setValue(getImageWidth() * zoomFactor + edgeMargin - width());
+        vScroll->setValue(-edgeMargin);
+        return;
+    }
+    if (corner == ImageCorner::BottomRight) {
+        hScroll->setValue(getImageWidth()  * zoomFactor + edgeMargin - width() );
+        vScroll->setValue(getImageHeight() * zoomFactor + edgeMargin - height());
+        return;
+    }
 }
 
 void ImageWindow::zoom(int zoomIncrement)
@@ -1658,10 +1692,40 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         // We let all these cases continue on to the end, where they're handled
         // in the case statement for Key_2.
         case Qt::Key_3:
+        {
+            if (mods == Qt::ControlModifier) {
+                showCentered();
+                break;
+            }
+        }
         case Qt::Key_4:
-        case Qt::Key_5:
+        {
+            if (mods == Qt::ControlModifier) {
+                showCorner(ImageCorner::TopLeft);
+                break;
+            }
+        }
+            case Qt::Key_5:
+        {
+            if (mods == Qt::ControlModifier) {
+                showCorner(ImageCorner::TopRight);
+                break;
+            }
+        }
         case Qt::Key_6:
+        {
+            if (mods == Qt::ControlModifier) {
+                showCorner(ImageCorner::BottomLeft);
+                break;
+            }
+        }
         case Qt::Key_7:
+        {
+            if (mods == Qt::ControlModifier) {
+                showCorner(ImageCorner::BottomRight);
+                break;
+            }
+        }
         case Qt::Key_8:
         case Qt::Key_9:
         case Qt::Key_0:
@@ -1673,6 +1737,9 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                 break;
             }
         }
+        // For 1 and 2, we also have to check the key in the case statement, because
+        // the numeric keys above "trickle down" into these two to avoid putting the bucket
+        // code into multiple cases.
         case Qt::Key_1:
         {
             if (event->key() == Qt::Key_1 && mods == Qt::ControlModifier) {
@@ -2101,6 +2168,7 @@ void ImageWindow::drawHelp()
     menu.append("\n"); numLines++;
     menu.append("CTRL+1                            zoom to fit\n"); numLines++;
     menu.append("CTRL+2                               zoom 1:1\n"); numLines++;
+    menu.append("CTRL+3-7     center / corners at current zoom\n"); numLines++;
     menu.append("\n"); numLines++;
     menu.append("I                             toggle info box\n"); numLines++;
     menu.append("C                            toggle color bar\n"); numLines++;

@@ -34,6 +34,15 @@ enum ImageWindowRotation : int
     CCW270
 };
 
+enum ImageCorner : int
+{
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
+    Center
+};
+
 class ImageWindow : public QGraphicsView
 {
     Q_OBJECT
@@ -107,6 +116,7 @@ public:
     void zoomFit();
     void zoom1To1() {zoom(0);}
     void showCentered();
+    void showCorner(ImageCorner corner);
 
     void syncWithFolder();
     bool readNextImage();

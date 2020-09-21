@@ -1,7 +1,7 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#define VERSION_STRING	"2020-08-26"
+#define VERSION_STRING	"2020-09-21"
 
 #endif // DEFINITIONS_H
 
