@@ -1059,10 +1059,15 @@ void ImageWindow::drawRulers()
     while (1)
     {
         xDraw = mapFromScene(xImg, 0).x(); //convert to viewport coordinates.
-        if (xDraw < cornerMargin)
+        while (xDraw < cornerMargin)
         {
-            xDraw = cornerMargin;
-            xImg = floor(mapToScene(xDraw, 0).x()) + 0.5;
+            // If we're within the margin, go to the first image location just outside it.
+            int xDrawOld = xDraw;
+            while (xDraw == xDrawOld) {
+                // This loop handles images that are zoomed out below 1:1.
+                xImg += 1;
+                xDraw = mapFromScene(xImg, 0).x();
+            }
         }
         if (xDraw > viewport()->width() - 1 - cornerMargin || xImg > getImageWidth()) break; //reached the other end.
 
@@ -1109,20 +1114,26 @@ void ImageWindow::drawRulers()
         if (!imgYOriginIsBottom)
         {
             // Start drawing the ruler at the top.
-            if (yDraw < cornerMargin)
+            while (yDraw < cornerMargin)
             {
-                yDraw = cornerMargin;
-                yImg = floor(mapToScene(0, yDraw).y()) + 0.5;
+                int yDrawOld = yDraw;
+                while (yDraw == yDrawOld) {
+                    yImg += 1;
+                    yDraw = mapFromScene(0, yImg).y();
+                }
             }
             if (yDraw > viewport()->height() - 1 - cornerMargin || yImg > getImageHeight()) break; //reached the other end.
         }
         else
         {
             // Since we're starting at the bottom, these conditions have to change.
-            if (yDraw > viewport()->height() - 1 - cornerMargin)
+            while (yDraw > viewport()->height() - 1 - cornerMargin)
             {
-                yDraw = viewport()->height() - 1 - cornerMargin;
-                yImg = floor(mapToScene(0, yDraw).y()) + 0.5;
+                int yDrawOld = yDraw;
+                while (yDraw == yDrawOld) {
+                    yImg -= 1;
+                    yDraw = mapFromScene(0, yImg).y();
+                }
             }
             if (yDraw < cornerMargin || yImg < 0) break; //reached the other end.
         }
