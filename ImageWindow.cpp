@@ -666,9 +666,8 @@ void ImageWindow::handleWheelEvent(QWheelEvent *event, bool /*forwarded*/)
 {
     showHelp = false;
 
-    wheelAccumulator += event->delta();
-
-    zoomCtr = event->pos();
+    wheelAccumulator += event->angleDelta().y();
+    zoomCtr = QPoint(event->position().x(), event->position().y());
 
     if(wheelAccumulator < -deltaThresh)
     {
