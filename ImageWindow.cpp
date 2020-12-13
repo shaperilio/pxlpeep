@@ -625,7 +625,24 @@ void ImageWindow::handleMouseMoveEvent(QMouseEvent *event, bool forwarded)
             curMousePos = QPoint(event->pos().x(), event->pos().y());
             //Must update the viewport, not the window!!!!!
             //http://stackoverflow.com/a/3318205/149506
-            viewport()->update(infoRect);
+
+            // 2020-12-13: I think there's a bug in Qt?
+            // I'm calculating infoRect and cusorInfoRect when I draw them - and drawing a filled
+            // rectangle with those exact dimensions.
+            // If I request an update with those very same rectangles, I see a line along the bottom and the
+            // right that are not repainted (Ubuntu 20.04 LTS straight ouf the box here).
+            // So I make the update region slightly larger.
+            QRect infoUpdate(infoUpdateRegion.topLeft(), QSize(infoUpdateRegion.width() + 1, infoUpdateRegion.height() + 1));
+            viewport()->update(infoUpdate);
+//            cout << "viewport()->update for " << infoRect.left() << ", " << infoRect.top() << " to "
+//                 << infoRect.right() << ", " << infoRect.bottom() << endl;
+
+            if (showCursorInfoBox) {
+                QRect cursorInfoUpdate(cursorInfoUpdateRegion.topLeft(), QSize(cursorInfoUpdateRegion.width() + 1, cursorInfoUpdateRegion.height() + 1));
+                viewport()->update(cursorInfoUpdate);
+//                cout << "viewport()->update for " << cursorInfoRect.left() << ", " << cursorInfoRect.top() << " to "
+//                     << cursorInfoRect.right() << ", " << cursorInfoRect.bottom() << endl;
+            }
         }
     }
 
@@ -763,8 +780,12 @@ void ImageWindow::paintEvent(QPaintEvent *event)
 
     QGraphicsView::paintEvent(event);
 
+//    auto r = event->rect();
+//    cout << "paintEvent for " << r.left() << ", " << r.top() << " to " << r.right() << ", " << r.bottom() << endl;
+
     drawRulers();
     drawInfoBox();
+    drawCursorInfoBox();
     drawHelp();
     drawColorbar();
     drawROI();
@@ -875,8 +896,8 @@ void ImageWindow::drawInfoBox()
         break;
     case ImageWindowRotation::CCW90:
         rot = " 90deg";
-        h = sourceImage->getWidth();
         w = sourceImage->getHeight();
+        h = sourceImage->getWidth();
         break;
     case ImageWindowRotation::CCW180:
         rot = " 180deg";
@@ -885,8 +906,8 @@ void ImageWindow::drawInfoBox()
         break;
     case ImageWindowRotation::CCW270:
         rot = " 270deg";
-        h = sourceImage->getWidth();
         w = sourceImage->getHeight();
+        h = sourceImage->getWidth();
         break;
     }
     line2.append(rot);
@@ -927,7 +948,7 @@ void ImageWindow::drawInfoBox()
     double curR = sqrtf(rX*rX + rY*rY);
     double curTheta = atan2(rY, rX) * 180 / M_PI;
 
-    line5 = QString::asprintf("X = %.1f, Y = %.1f (R = %.1f, θ = %.1f)", curX, curY, curR, curTheta);
+    line5 = QString::asprintf("X = %.2f, Y = %.2f (R = %.2f, θ = %.2f)", curX, curY, curR, curTheta);
 
     QString colorVal;
     if (zoomedPos.x() > 0 && zoomedPos.x() < sourceImage->getWidth() &&
@@ -1004,42 +1025,153 @@ void ImageWindow::drawInfoBox()
 
     QRect winRect = geometry();
 
-    infoRect.setLeft(winRect.width() - 1 - boxPad - infoW);
-    infoRect.setTop(boxPad);
-    infoRect.setWidth(infoW);
-    infoRect.setHeight(infoH);
+    infoUpdateRegion.setLeft(winRect.width() - 1 - boxPad - infoW);
+    infoUpdateRegion.setTop(boxPad);
+    infoUpdateRegion.setWidth(infoW);
+    infoUpdateRegion.setHeight(infoH);
 
     //Now start drawing stuff.
     QPainter p(viewport());
     p.setBrush(Qt::black);
-    p.drawRect(infoRect);
+    p.drawRect(infoUpdateRegion);
 
     p.setPen(Qt::white);
     p.setFont(windowFont);
-    QRect lineRect(infoRect.x(), infoRect.y(), infoRect.width()*2, infoRect.height()*2);
+    QRect lineRect(infoUpdateRegion.x(), infoUpdateRegion.y(), infoUpdateRegion.width()*2, infoUpdateRegion.height()*2);
 
-    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line1) - boxMargin);
+    lineRect.setX(infoUpdateRegion.x() + infoUpdateRegion.width() - fm.horizontalAdvance(line1) - boxMargin);
     lineRect.setY(lineRect.y() + boxMargin);
     p.drawText(lineRect, line1);
 
-    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line2) - boxMargin);
+    lineRect.setX(infoUpdateRegion.x() + infoUpdateRegion.width() - fm.horizontalAdvance(line2) - boxMargin);
     lineRect.setY(lineRect.y() + lineVspace + lineH);
     p.drawText(lineRect, line2);
 
-    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line3) - boxMargin);
+    lineRect.setX(infoUpdateRegion.x() + infoUpdateRegion.width() - fm.horizontalAdvance(line3) - boxMargin);
     lineRect.setY(lineRect.y() + lineVspace + lineH);
     p.drawText(lineRect, line3);
 
     if (line4Valid)
     {
-        lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line4) - boxMargin);
+        lineRect.setX(infoUpdateRegion.x() + infoUpdateRegion.width() - fm.horizontalAdvance(line4) - boxMargin);
         lineRect.setY(lineRect.y() + lineVspace + lineH);
         p.drawText(lineRect, line4);
     }
 
-    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line5) - boxMargin);
+    lineRect.setX(infoUpdateRegion.x() + infoUpdateRegion.width() - fm.horizontalAdvance(line5) - boxMargin);
     lineRect.setY(lineRect.y() + lineVspace + lineH - 2);
     p.drawText(lineRect, line5);
+}
+
+void ImageWindow::drawCursorInfoBox()
+{
+    if (!showCursorInfoBox) return;
+
+    QPainter p(viewport());
+    // If the zoom level is high enough, we will draw a marker that is locked to half-pixel units, and the info box will be
+    // locked to that. Otherwise, we just follow the mouse cursor with the info box.
+    QPoint infoBoxRef; // reference coordinates for the inf box.
+    double const markerZoomLevel = 64;
+    QRect pixelMarkerRect;
+
+    //Pixel coordinates
+    QPointF zoomedPos = mapToScene(curMousePos);
+
+    if (zoomFactor >= markerZoomLevel) {
+        // Round them to the nearest 0.5 pixels.
+        zoomedPos.setX(floor(zoomedPos.x() * 2 + 0.5) / 2.0);
+        zoomedPos.setY(floor(zoomedPos.y() * 2 + 0.5) / 2.0);
+        QPoint pixelPosition = mapFromScene(zoomedPos);
+        infoBoxRef = pixelPosition;
+
+        // Draw a marker there.
+        int third = 3;
+        int half = third * 3;
+        int pixelMarkerSize = half * 2;
+        pixelMarkerRect = QRect(pixelPosition.x() - half, pixelPosition.y() - half, pixelMarkerSize, pixelMarkerSize);
+        QRect markerBox(pixelMarkerRect);
+        p.setBrush(Qt::black);
+        p.drawRect(markerBox);
+        markerBox.adjust(third, third, -third, -third);
+        p.setBrush(Qt::white);
+        p.drawRect(markerBox);
+        markerBox.adjust(third, third, -third, -third);
+        p.setBrush(Qt::black);
+        p.drawRect(markerBox);
+    } else {
+        infoBoxRef = curMousePos;
+    }
+
+    // Compute the pixel coordinates like in drawInfoBox
+    auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
+    int w, h;
+    if (rotation == ImageWindowRotation::Zero || rotation == ImageWindowRotation::CCW180) {
+        w = sourceImage->getWidth();
+        h = sourceImage->getHeight();
+    } else {
+        w = sourceImage->getHeight();
+        h = sourceImage->getWidth();
+    }
+
+    double curX, curY;
+
+    curY = zoomedPos.y();
+    if (imgYOriginIsBottom)
+        curY = getImageHeight() - curY;
+    curY = curY + (imgIsZeroIndexed ? 0 : 1) - 0.5;
+
+    curX = zoomedPos.x() + (imgIsZeroIndexed ? 0 : 1) - 0.5;
+
+    double rX = curX - (imgIsZeroIndexed ? 0 : 1) - static_cast<double>(w)/2 + 0.5;
+    double rY = curY - (imgIsZeroIndexed ? 0 : 1) - static_cast<double>(h)/2 + 0.5;
+    double curR = sqrtf(rX*rX + rY*rY);
+    double curTheta = atan2(rY, rX) * 180 / M_PI;
+
+    QString line1 = QString::asprintf("X = %.1f, Y = %.1f", curX, curY);
+    QString line2 = QString::asprintf("R = %.1f, θ = %.1f", curR, curTheta);
+
+    // Draw the info box.
+    QFontMetrics fm(windowFont);
+    int line1Width = fm.horizontalAdvance(line1);
+    int line2Width = fm.horizontalAdvance(line2);
+    int maxW = line1Width;
+    if (line2Width > maxW) maxW = line2Width;
+    int infoW = maxW + 2 * boxMargin;
+
+    int lineH = fm.height();
+    int infoH = lineH * 2 + 2 * boxMargin;
+
+    int x = infoBoxRef.x() + 10;
+    int y = infoBoxRef.y() + 10;
+
+    // Ensure the whole box fits inside the window.
+    QRect winRect = geometry();
+    int limitW = winRect.width();
+    int limitH = winRect.height();
+
+    if (x + infoW > limitW) x = limitW - infoW;
+    if (x < 0) x = 0;
+
+    if (y + infoH > limitH) y = limitH - infoH;
+    if (y < 0) y = 0;
+
+    QRect cursorInfoBox(x, y, infoW, infoH);
+
+    //Now start drawing stuff.
+    p.setBrush(Qt::black);
+    p.drawRect(cursorInfoBox);
+
+    p.setPen(Qt::white);
+    p.setFont(windowFont);
+    QRect lineRect(cursorInfoBox.left() + cursorInfoBox.width() - line1Width - boxMargin, cursorInfoBox.top() + boxMargin,
+                   cursorInfoBox.width()*2, cursorInfoBox.height()*2);
+    p.drawText(lineRect, line1);
+    lineRect.setX(cursorInfoBox.left() + cursorInfoBox.width() - line2Width - boxMargin);
+    lineRect.setY(lineRect.top() + lineH);
+    p.drawText(lineRect, line2);
+
+    // Set the update region, depending on whether or not we've drawn the pixel marker.
+    cursorInfoUpdateRegion = cursorInfoBox.united(pixelMarkerRect);
 }
 
 void ImageWindow::drawRulers()
@@ -1890,6 +2022,14 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             viewport()->update();
             break;
         }
+        case Qt::Key_Space:
+        {
+            if (mods != Qt::NoModifier) break;
+
+            showCursorInfoBox = !showCursorInfoBox;
+            viewport()->update();
+            break;
+        }
         case Qt::Key_C:
         {
             if (mods == Qt::ControlModifier && !forwarded)
@@ -2190,6 +2330,7 @@ void ImageWindow::drawHelp()
     menu.append("CTRL+3-7     center / corners at current zoom\n"); numLines++;
     menu.append("\n"); numLines++;
     menu.append("I                             toggle info box\n"); numLines++;
+    menu.append("space                  toggle cursor info box\n"); numLines++;
     menu.append("C                            toggle color bar\n"); numLines++;
     menu.append("X                               toggle rulers\n"); numLines++;
     menu.append("\n"); numLines++;
@@ -2212,7 +2353,7 @@ void ImageWindow::drawHelp()
     menu.append("Y                  origin is at top or bottom\n"); numLines++;
 
     QRect menuRect(r.width() - 1 - (width + 2 * boxMargin) - boxPad,
-                   infoRect.top() + infoRect.height() + boxPad,
+                   infoUpdateRegion.top() + infoUpdateRegion.height() + boxPad,
                    width + 2 * boxMargin,
                    fm.height() * numLines + 2 * boxMargin);
 

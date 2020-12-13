@@ -68,6 +68,7 @@ public:
         activeChannels = chanR | chanG | chanB;
 
         showInfoBox = true;
+        showCursorInfoBox = false;
         showRulers  = true;
         showColorbar = true;
         showHelp = true;
@@ -138,6 +139,9 @@ public:
 
     void setShowInfoBox(bool val) {if (showInfoBox == val) return; showInfoBox = val; viewport()->update();}
     bool getShowInfoBox() {return showInfoBox;}
+
+    void setShowCursorInfoBox(bool val) {if (showCursorInfoBox == val) return; showCursorInfoBox = val; viewport()->update();}
+    bool getShowCursorInfoBox() {return showCursorInfoBox;}
 
     void setShowHelp(bool val) {if (showHelp == val) return; showHelp = val; viewport()->update();}
     bool getShowHelp() {return showHelp;}
@@ -220,9 +224,15 @@ protected:
     static const int boxPad    = 25;
 
     QPoint curMousePos;
-    QRect infoRect;
+    // keep track of which parts of the viewport the info and cursor info boxes take up
+    // for repainting.
+    QRect infoUpdateRegion, cursorInfoUpdateRegion;
+
     bool showInfoBox;
     void drawInfoBox();
+
+    bool showCursorInfoBox;
+    void drawCursorInfoBox();
 
     bool showRulers;
     void drawRulers();
