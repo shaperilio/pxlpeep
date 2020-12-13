@@ -41,15 +41,21 @@ ImageWindow::ImageWindow(int ID)
     int id = QFontDatabase::addApplicationFont(":/fonts/ProFontWindows.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     windowFont = QFont(family);
-#ifdef Q_OS_MACOS
+#if defined(Q_OS_MACOS)
     // If we do a titleless window on Mac, you can't resize the window.
     // Tool windows have a smaller titlebar but they are always on top of the main window.
 //    setWindowFlags(Qt::Tool);
 //    setAttribute(Qt::WA_MacAlwaysShowToolWindow); // so it doesn't disappear when we lose focus.
     windowFont.setPointSize(11);
+#elif defined(Q_OS_LINUX)
+    // Ubuntu 20.04 LTS out of the box...
+//    setWindowFlags(Qt::Tool); // sizeable, stays on top of main window, but has title bar.
+    // Looks like there's no way to get a titleless, sizable window in 20.04 LTS anymore...
+    setWindowFlags(Qt::CustomizeWindowHint); //no title bar, but not sizable.
+    windowFont.setPointSize(8);
 #else
     windowFont.setPointSize(8);
-    setWindowFlags(Qt::CustomizeWindowHint); //sizeable border without title bar.
+    setWindowFlags(Qt::CustomizeWindowHint); //sizeable border without title bar
 #endif
     //The update mode is important because we will draw on top of the image things that
     //we don't want to scroll with the image (color bar, info box, etc.).
