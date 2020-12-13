@@ -856,9 +856,12 @@ void ImageWindow::drawInfoBox()
     //Filename
     QString line1 = curFilename;
 
+    //Modified date
+    QString line2 = "Last modified " + sourceImageBufferModifiedDate[currentImageBufferIndex].toString("yyyy-MM-dd hh:mm:ss");
+
     //Width, height, zoom, and rotation
     auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
-    QString line2 = QString::asprintf("W = %d, H = %d pix (%.2fX)",
+    QString line3 = QString::asprintf("W = %d, H = %d pix (%.2fX)",
                                       sourceImage->getWidth(), sourceImage->getHeight(), zoomFactor);
 
     QString rot;
@@ -894,21 +897,21 @@ void ImageWindow::drawInfoBox()
     if (flipHorizontal && flipVertical)
         line2.append(" H+V flip");
 
-    QString line3;
-    bool line3Valid = false;
+    QString line4;
+    bool line4Valid = false;
     int ISO;
     if (sourceImage->getEXIFISO(ISO))
     {
-        line3Valid = true;
+        line4Valid = true;
         double shutter, EV;
         sourceImage->getEXIFShutter(shutter);
         sourceImage->getEXIFEV(EV);
-        line3 = QString::asprintf("ISO = %d, shutter = %.2f ms, EV = %.2f", ISO, shutter, EV);
+        line4 = QString::asprintf("ISO = %d, shutter = %.2f ms, EV = %.2f", ISO, shutter, EV);
     }
 
     //Pixel coordinates
     QPointF zoomedPos = mapToScene(curMousePos);
-    QString line4;
+    QString line5;
 
     double curX, curY;
 
@@ -924,7 +927,7 @@ void ImageWindow::drawInfoBox()
     double curR = sqrtf(rX*rX + rY*rY);
     double curTheta = atan2(rY, rX) * 180 / M_PI;
 
-    line4 = QString::asprintf("X = %.1f, Y = %.1f (R = %.1f, θ = %.1f)", curX, curY, curR, curTheta);
+    line5 = QString::asprintf("X = %.1f, Y = %.1f (R = %.1f, θ = %.1f)", curX, curY, curR, curTheta);
 
     QString colorVal;
     if (zoomedPos.x() > 0 && zoomedPos.x() < sourceImage->getWidth() &&
@@ -984,19 +987,19 @@ void ImageWindow::drawInfoBox()
 
             colorVal = " -> " + R + ", " + G + ", " + B;
         }
-        line4.append(colorVal);
+        line5.append(colorVal);
     }
 
     int maxW = fm.horizontalAdvance(line1);
     if(fm.horizontalAdvance(line2) > maxW) maxW = fm.horizontalAdvance(line2);
-    if(line3Valid && fm.horizontalAdvance(line3) > maxW) maxW = fm.horizontalAdvance(line3);
-    if(fm.horizontalAdvance(line4) > maxW) maxW = fm.horizontalAdvance(line4);
+    if(line4Valid && fm.horizontalAdvance(line4) > maxW) maxW = fm.horizontalAdvance(line4);
+    if(fm.horizontalAdvance(line5) > maxW) maxW = fm.horizontalAdvance(line5);
 
     int lineH = fm.height();
     int lineVspace = 0;
 
     int infoW = maxW + 2 * boxMargin;
-    int numLines = (line3Valid ? 4 : 3);
+    int numLines = (line4Valid ? 5 : 4);
     int infoH = lineH * numLines + lineVspace * (numLines - 1) + 2 * boxMargin;
 
     QRect winRect = geometry();
@@ -1023,16 +1026,20 @@ void ImageWindow::drawInfoBox()
     lineRect.setY(lineRect.y() + lineVspace + lineH);
     p.drawText(lineRect, line2);
 
-    if (line3Valid)
+    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line3) - boxMargin);
+    lineRect.setY(lineRect.y() + lineVspace + lineH);
+    p.drawText(lineRect, line3);
+
+    if (line4Valid)
     {
-        lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line3) - boxMargin);
+        lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line4) - boxMargin);
         lineRect.setY(lineRect.y() + lineVspace + lineH);
-        p.drawText(lineRect, line3);
+        p.drawText(lineRect, line4);
     }
 
-    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line4) - boxMargin);
+    lineRect.setX(infoRect.x() + infoRect.width() - fm.horizontalAdvance(line5) - boxMargin);
     lineRect.setY(lineRect.y() + lineVspace + lineH - 2);
-    p.drawText(lineRect, line4);
+    p.drawText(lineRect, line5);
 }
 
 void ImageWindow::drawRulers()
