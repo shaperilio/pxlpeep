@@ -922,8 +922,8 @@ void ImageWindow::drawInfoBox()
 
     curX = zoomedPos.x() + (imgIsZeroIndexed ? 0 : 1) - 0.5;
 
-    double rX = curX - (imgIsZeroIndexed ? 0 : 1) - static_cast<double>(w)/2;
-    double rY = curY - (imgIsZeroIndexed ? 0 : 1) - static_cast<double>(h)/2;
+    double rX = curX - (imgIsZeroIndexed ? 0 : 1) - static_cast<double>(w)/2 + 0.5;
+    double rY = curY - (imgIsZeroIndexed ? 0 : 1) - static_cast<double>(h)/2 + 0.5;
     double curR = sqrtf(rX*rX + rY*rY);
     double curTheta = atan2(rY, rX) * 180 / M_PI;
 
