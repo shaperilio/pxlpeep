@@ -638,13 +638,16 @@ void ImageWindow::handleMouseMoveEvent(QMouseEvent *event, bool forwarded)
             // If I request an update with those very same rectangles, I see a line along the bottom and the
             // right that are not repainted (Ubuntu 20.04 LTS straight ouf the box here).
             // So I make the update region slightly larger.
-            QRect infoUpdate(infoUpdateRegion.topLeft(), QSize(infoUpdateRegion.width() + 1, infoUpdateRegion.height() + 1));
+            // On Mac, the top left leaves a trail.
+            QRect infoUpdate(infoUpdateRegion);
+            infoUpdate.adjust(-1, -1, 1, 1);
             viewport()->update(infoUpdate);
 //            cout << "viewport()->update for " << infoRect.left() << ", " << infoRect.top() << " to "
 //                 << infoRect.right() << ", " << infoRect.bottom() << endl;
 
             if (showCursorInfoBox) {
-                QRect cursorInfoUpdate(cursorInfoUpdateRegion.topLeft(), QSize(cursorInfoUpdateRegion.width() + 1, cursorInfoUpdateRegion.height() + 1));
+                QRect cursorInfoUpdate(cursorInfoUpdateRegion);
+                cursorInfoUpdate.adjust(-1, -1, 1, 1);
                 viewport()->update(cursorInfoUpdate);
 //                cout << "viewport()->update for " << cursorInfoRect.left() << ", " << cursorInfoRect.top() << " to "
 //                     << cursorInfoRect.right() << ", " << cursorInfoRect.bottom() << endl;
