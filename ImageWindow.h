@@ -266,7 +266,7 @@ protected:
     };
 
     snapType currentSnap;
-    void snapWindowTo(snapType snap, int screenNum);
+    void snapWindowTo(snapType snap, QScreen * screen = 0);
 
     QList<QString> fileList;
     QString nextFile, prevFile;

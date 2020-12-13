@@ -1510,7 +1510,8 @@ void ImageWindow::drawROI()
 }
 
 #include <QApplication>
-void ImageWindow::snapWindowTo(snapType snap, int screenNum)
+#include <QScreen>
+void ImageWindow::snapWindowTo(snapType snap, QScreen * screen)
 {
     int halfBorder = (frameGeometry().width()  - geometry().width() )/2; // thickness of window border.
 
@@ -1525,11 +1526,11 @@ void ImageWindow::snapWindowTo(snapType snap, int screenNum)
 
     //We need to establish on our own the screen layout for left-to-right, because Qt doesn't
     //seem to handle that very well.
-    QDesktopWidget * desktop = QApplication::desktop();
     QRect screenDims;
-    int numScreens = desktop->numScreens();
-    int screensL2R[numScreens];
-    memset(screensL2R, -1, numScreens * sizeof(int));
+    QList<QScreen *> screens = QGuiApplication::screens();
+    int numScreens = screens.size();
+    QScreen * screensL2R[numScreens];
+    memset(screensL2R, 0, numScreens * sizeof(QScreen *));
     for (int j = 0; j < numScreens; j++)
     {
         int curMin = std::numeric_limits<int>::max();
@@ -1537,16 +1538,16 @@ void ImageWindow::snapWindowTo(snapType snap, int screenNum)
         {
             bool skip = false;
             for (int k = 0; k < j; k++)
-                if (i == screensL2R[k])
+                if (screens[i] == screensL2R[k])
                 {
                     skip = true;
                     break;
                 }
             if (skip) continue; //screen already accounted for.
-            if (desktop->screenGeometry(i).left() < curMin)
+            if (screens[i]->geometry().left() < curMin)
             {
-                screensL2R[j] = i;
-                curMin = desktop->screenGeometry(i).left();
+                screensL2R[j] = screens[i];
+                curMin = screens[i]->geometry().left();
             }
         }
     }
@@ -1558,134 +1559,134 @@ void ImageWindow::snapWindowTo(snapType snap, int screenNum)
         //to snap "right" on a monitor that is to the left.
         if (currentSnap == Left)
         {
-            screenNum = desktop->screenNumber(geometry().topLeft());
+            screen = QGuiApplication::screenAt(geometry().topLeft());
             //Find out if there's a screen to the left of this one.
             int i;
             for (i = 0; i < numScreens; i++)
-                if (screenNum == screensL2R[i]) break;
+                if (screen == screensL2R[i]) break;
             if (i == 0)
                 break; //do nothing; no more monitors available.
             snapWindowTo(Right, screensL2R[i-1]); //snap right on the monitor to the left.
             break;
         }
         currentSnap = Left;
-        if (screenNum == -1)
-            screenNum = desktop->screenNumber(geometry().topLeft());
-        screenDims = desktop->availableGeometry(screenNum);
+        if (screen == 0)
+            screen = QGuiApplication::screenAt(geometry().topLeft());
+        screenDims = screen->geometry();
         move(screenDims.left(), screenDims.top());
         resize(screenDims.width()/2 - 2*halfBorder, screenDims.height() - 2*halfBorder);
         break;
     case TopLeft:
         if (currentSnap == TopLeft)
         {
-            screenNum = desktop->screenNumber(geometry().topLeft());
+            screen = QGuiApplication::screenAt(geometry().topLeft());
             int i;
             for (i = 0; i < numScreens; i++)
-                if (screenNum == screensL2R[i]) break;
+                if (screen == screensL2R[i]) break;
             if (i == 0)
                 break;
             snapWindowTo(TopRight, screensL2R[i-1]);
             break;
         }
         currentSnap = TopLeft;
-        if (screenNum == -1)
-            screenNum = desktop->screenNumber(geometry().topLeft());
-        screenDims = desktop->availableGeometry(screenNum);
+        if (screen == 0)
+            screen = QGuiApplication::screenAt(geometry().topLeft());
+        screenDims = screen->geometry();
         move(screenDims.left(), screenDims.top());
         resize(screenDims.width()/2 - 2*halfBorder, screenDims.height()/2 - 2*halfBorder);
         break;
     case BottomLeft:
         if (currentSnap == BottomLeft)
         {
-            screenNum = desktop->screenNumber(geometry().topLeft());
+            screen = QGuiApplication::screenAt(geometry().topLeft());
             int i;
             for (i = 0; i < numScreens; i++)
-                if (screenNum == screensL2R[i]) break;
+                if (screen == screensL2R[i]) break;
             if (i == 0)
                 break;
             snapWindowTo(BottomRight, screensL2R[i-1]);
             break;
         }
         currentSnap = BottomLeft;
-        if (screenNum == -1)
-            screenNum = desktop->screenNumber(geometry().topLeft());
-        screenDims = desktop->availableGeometry(screenNum);
+        if (screen == 0)
+            screen = QGuiApplication::screenAt(geometry().topLeft());
+        screenDims = screen->geometry();
         move(screenDims.left(), screenDims.height()/2 + screenDims.top());
         resize(screenDims.width()/2 - 2*halfBorder, screenDims.height()/2 - 2*halfBorder);
         break;
     case Right:
         if (currentSnap == Right)
         {
-            screenNum = desktop->screenNumber(geometry().topLeft());
+            screen = QGuiApplication::screenAt(geometry().topLeft());
             //Find out if there's a screen to the right of this one.
             int i;
             for (i = 0; i < numScreens; i++)
-                if (screenNum == screensL2R[i]) break;
+                if (screen == screensL2R[i]) break;
             if (i == numScreens - 1)
                 break; //do nothing; no more monitors available.
             snapWindowTo(Left, screensL2R[i+1]); //snap right on the monitor to the left.
             break;
         }
         currentSnap = Right;
-        if (screenNum == -1)
-            screenNum = desktop->screenNumber(geometry().topRight());
-        screenDims = desktop->availableGeometry(screenNum);
+        if (screen == 0)
+            screen = QGuiApplication::screenAt(geometry().topRight());
+        screenDims = screen->geometry();
         move(screenDims.width()/2 + screenDims.left(), screenDims.top());
         resize(screenDims.width()/2 - 2*halfBorder, screenDims.height() - 2*halfBorder);
         break;
     case TopRight:
         if (currentSnap == TopRight)
         {
-            screenNum = desktop->screenNumber(geometry().topLeft());
+            screen = QGuiApplication::screenAt(geometry().topLeft());
             int i;
             for (i = 0; i < numScreens; i++)
-                if (screenNum == screensL2R[i]) break;
+                if (screen == screensL2R[i]) break;
             if (i == numScreens - 1)
                 break;
             snapWindowTo(TopLeft, screensL2R[i+1]);
             break;
         }
         currentSnap = TopRight;
-        if (screenNum == -1)
-            screenNum = desktop->screenNumber(geometry().topLeft());
-        screenDims = desktop->availableGeometry(screenNum);
+        if (screen == 0)
+            screen = QGuiApplication::screenAt(geometry().topRight());
+        screenDims = screen->geometry();
         move(screenDims.width()/2 + screenDims.left(), screenDims.top());
         resize(screenDims.width()/2 - 2*halfBorder, screenDims.height()/2 - 2*halfBorder);
         break;
     case BottomRight:
         if (currentSnap == BottomRight)
         {
-            screenNum = desktop->screenNumber(geometry().topLeft());
+            screen = QGuiApplication::screenAt(geometry().topLeft());
             int i;
             for (i = 0; i < numScreens; i++)
-                if (screenNum == screensL2R[i]) break;
+                if (screen == screensL2R[i]) break;
             if (i == numScreens - 1)
                 break;
             snapWindowTo(BottomLeft, screensL2R[i+1]);
             break;
         }
         currentSnap = BottomRight;
-        if (screenNum == -1)
-            screenNum = desktop->screenNumber(geometry().topLeft());
-        screenDims = desktop->availableGeometry(screenNum);
+        if (screen == 0)
+            screen = QGuiApplication::screenAt(geometry().topRight());
+        screenDims = screen->geometry();
         move(screenDims.width()/2 + screenDims.left(), screenDims.height()/2 + screenDims.top());
         resize(screenDims.width()/2 - 2*halfBorder, screenDims.height()/2 - 2*halfBorder);
         break;
     case Max:
         currentSnap = Max;
-        if (screenNum == -1)
-            screenNum = desktop->screenNumber( QPoint((geometry().left() + geometry().right() )/2,
-                                                     (geometry().top()  + geometry().bottom())/2));
-        screenDims = desktop->availableGeometry(screenNum);
+        if (screen == 0)
+            screen = QGuiApplication::screenAt(QPoint((geometry().left() + geometry().right() )/2,
+                                                      (geometry().top()  + geometry().bottom())/2));
+        screenDims = screen->geometry();
         move(screenDims.left(), screenDims.top());
         resize(screenDims.width() - 2*halfBorder, screenDims.height() - 2*halfBorder);
         break;
     case Restore:
         currentSnap = Restore;
-        if (screenNum == -1)
-            screenNum = desktop->screenNumber( QPoint((geometry().left() + geometry().right() )/2,
-                                                     (geometry().top()  + geometry().bottom())/2));
-        screenDims = desktop->availableGeometry(screenNum);
+        if (screen == 0)
+            screen = QGuiApplication::screenAt(QPoint((geometry().left() + geometry().right() )/2,
+                                                      (geometry().top()  + geometry().bottom())/2));
+        screenDims = screen->geometry();
         move(screenDims.left() + screenDims.width() / 4, screenDims.top() + screenDims.height() / 4);
         resize(screenDims.width() / 2 - 2*halfBorder, screenDims.height() / 2 - 2*halfBorder);
         break;
@@ -1953,19 +1954,19 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                 if (mods == Qt::ControlModifier ||
                     mods == (Qt::ControlModifier | Qt::KeypadModifier))
                 {
-                    snapWindowTo(Left, -1);
+                    snapWindowTo(Left);
                     break;
                 }
                 if (mods == (Qt::ControlModifier | Qt::ShiftModifier) ||
                     mods == (Qt::ControlModifier | Qt::ShiftModifier | Qt::KeypadModifier))
                 {
-                    snapWindowTo(TopLeft, -1);
+                    snapWindowTo(TopLeft);
                     break;
                 }
                 if (mods == (Qt::AltModifier | Qt::ShiftModifier) ||
                     mods == (Qt::AltModifier | Qt::ShiftModifier | Qt::KeypadModifier))
                 {
-                    snapWindowTo(BottomLeft, -1);
+                    snapWindowTo(BottomLeft);
                     break;
                 }
                 if (mods == Qt::NoModifier ||
@@ -1986,19 +1987,19 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                 if (mods == Qt::ControlModifier ||
                     mods == (Qt::ControlModifier | Qt::KeypadModifier))
                 {
-                    snapWindowTo(Right, -1);
+                    snapWindowTo(Right);
                     break;
                 }
                 if (mods == (Qt::ControlModifier | Qt::ShiftModifier) ||
                     mods == (Qt::ControlModifier | Qt::ShiftModifier | Qt::KeypadModifier))
                 {
-                    snapWindowTo(TopRight, -1);
+                    snapWindowTo(TopRight);
                     break;
                 }
                 if (mods == (Qt::AltModifier | Qt::ShiftModifier) ||
                     mods == (Qt::AltModifier | Qt::ShiftModifier | Qt::KeypadModifier))
                 {
-                    snapWindowTo(BottomRight, -1);
+                    snapWindowTo(BottomRight);
                     break;
                 }
                 if (mods == Qt::NoModifier || mods == Qt::KeypadModifier)
@@ -2015,14 +2016,14 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
         {
             if (!forwarded)
                 if (mods == Qt::ControlModifier || mods == (Qt::ControlModifier | Qt::KeypadModifier))
-                    snapWindowTo(Max, -1);
+                    snapWindowTo(Max);
             break;
         }
         case Qt::Key_Down:
         {
             if (!forwarded)
                 if (mods == Qt::ControlModifier || mods == (Qt::ControlModifier | Qt::KeypadModifier))
-                    snapWindowTo(Restore, -1);
+                    snapWindowTo(Restore);
             break;
         }
         case Qt::Key_F5:
