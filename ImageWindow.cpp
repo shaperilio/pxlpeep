@@ -701,7 +701,7 @@ void ImageWindow::zoomFit()
     zoomFactor = pow(zoomStep, zoomLevel);
     QMatrix scaleMatrix;
     scaleMatrix.scale(zoomFactor, zoomFactor);
-    setMatrix(scaleMatrix);
+    setTransform(QTransform(scaleMatrix));
     showCentered();
 }
 
@@ -772,7 +772,7 @@ void ImageWindow::zoom(int zoomIncrement)
     auto zoomLocationOnImageBefore = mapToScene(zoomCtr);
     QMatrix scaleMatrix;
     scaleMatrix.scale(zoomFactor, zoomFactor);
-    setMatrix(scaleMatrix);
+    setTransform(QTransform(scaleMatrix));
     auto zoomCtrAfter = mapFromScene(zoomLocationOnImageBefore);
     auto zoomLocationDelta = zoomCtrAfter - zoomCtr;
     horizontalScrollBar()->setValue(horizontalScrollBar()->value() + zoomLocationDelta.x());
