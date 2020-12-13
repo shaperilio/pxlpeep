@@ -283,7 +283,7 @@ void MainDialog::openAndShow(int windowID, QString filename)
                     lastFileLocation,
                     "All files (*.*);;JPEG (*.jpg *.jpeg);;TIFF (*.tif *.tiff);;PNG (*.png);;BMP (*.bmp);;Photoshop (*.PSD)", //filter
                     &lastFileType,
-                    nullptr //options
+                    QFileDialog::Options() //default
                     );
         if (filename.isNull()) {
             // User canceled.
