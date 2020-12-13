@@ -377,11 +377,12 @@ void MainDialog::dropEvent(QDropEvent *e)
     }
 }
 
+#include <QScreen>
 int MainDialog::exec()
 {
     this->move(-50000, -50000); //make sure the window isn't visible.
     QDialog::show();            //show the window, so that frameGeometry will be correct.
-    QRect r = QApplication::desktop()->screenGeometry();
+    QRect r = QGuiApplication::primaryScreen()->geometry();
     this->move(r.width() - this->frameGeometry().width(), 0);
     for (QString image : filesToOpenAtStartup)
         openAndShow(-1, image);
