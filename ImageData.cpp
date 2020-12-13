@@ -181,13 +181,28 @@ void ImageData::retrieveEXIFTags(FIBITMAP *img)
         EXIFAperture = temp.toDouble();
     }
 
+    haveEXIFDate = false;
+    FITAG *date = nullptr;
+    FreeImage_GetMetadata(FIMD_EXIF_EXIF, img, "DateTimeOriginal", &date);
+    if (date != nullptr)
+    {
+        haveEXIFDate = true;
+        EXIFDate = QString((char *)FreeImage_TagToString(FIMD_EXIF_EXIF, date));
+        // It apperas in YYYY:MM:DD HH:MM:SS format.
+        QString subStr(":"); // String to replace.
+        QString newStr("-"); // Replacement string.
+        EXIFDate.replace(EXIFDate.indexOf(subStr), subStr.size(), newStr);
+        EXIFDate.replace(EXIFDate.indexOf(subStr), subStr.size(), newStr);
+        cout << "EXIF Date: " << EXIFDate.toStdString() << endl;
+    }
+
     haveEXIFShutter = false;
     FITAG *shutter = nullptr;
     FreeImage_GetMetadata(FIMD_EXIF_EXIF, img, "ExposureTime", &shutter);
     if (shutter != nullptr)
     {
         haveEXIFShutter = true;
-        QString temp = QString((char *)FreeImage_TagToString(FIMD_EXIF_EXIF, shutter));
+        QString temp = QString((char *)FreeImage_TagToString(FIMD_EXIF_MAIN, shutter));
         //FreeImage outputs this as a fraction. We need to calculate the number by finding the "/"
         QStringList fraction = temp.split("/");
         if (fraction.count() != 2)
@@ -244,6 +259,9 @@ void ImageData::resetEXIFStatus()
 
     haveEXIFAperture = false;
     EXIFAperture = 0;
+
+    haveEXIFDate = false;
+    EXIFDate = "";
 
     haveEXIFTemperatures = false;
     EXIFSensorTemp = 0;

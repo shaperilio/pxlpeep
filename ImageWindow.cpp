@@ -918,16 +918,29 @@ void ImageWindow::drawInfoBox()
     if (flipHorizontal && flipVertical)
         line2.append(" H+V flip");
 
-    QString line4;
-    bool line4Valid = false;
+    QString lineExposure;
+    bool lineExposureValid = false;
     int ISO;
     if (sourceImage->getEXIFISO(ISO))
     {
-        line4Valid = true;
+        lineExposureValid = true;
         double shutter, EV;
         sourceImage->getEXIFShutter(shutter);
         sourceImage->getEXIFEV(EV);
-        line4 = QString::asprintf("ISO = %d, shutter = %.2f ms, EV = %.2f", ISO, shutter, EV);
+
+        lineExposure = QString::asprintf("ISO = %d, shutter = %.2f ms, EV = %.2f", ISO, shutter, EV);
+    }
+
+    QString lineDate;
+    bool lineDateValid = false;
+    QString date;
+    if (sourceImage->getEXIFDate(date))
+    {
+        lineDateValid = true;
+        QString device, firmware;
+        sourceImage->getEXIFMake(device);
+        sourceImage->getEXIFFirmware(firmware);
+        lineDate = "Created " + date + ", " + device + " (" + firmware + ")";
     }
 
     //Pixel coordinates
@@ -1013,14 +1026,15 @@ void ImageWindow::drawInfoBox()
 
     int maxW = fm.horizontalAdvance(line1);
     if(fm.horizontalAdvance(line2) > maxW) maxW = fm.horizontalAdvance(line2);
-    if(line4Valid && fm.horizontalAdvance(line4) > maxW) maxW = fm.horizontalAdvance(line4);
+    if(lineExposureValid && fm.horizontalAdvance(lineExposure) > maxW) maxW = fm.horizontalAdvance(lineExposure);
+    if(lineDateValid && fm.horizontalAdvance(lineDate) > maxW) maxW = fm.horizontalAdvance(lineDate);
     if(fm.horizontalAdvance(line5) > maxW) maxW = fm.horizontalAdvance(line5);
 
     int lineH = fm.height();
     int lineVspace = 0;
 
     int infoW = maxW + 2 * boxMargin;
-    int numLines = (line4Valid ? 5 : 4);
+    int numLines = 4 + (lineExposureValid ? 1 : 0) + (lineDateValid ? 1 : 0);
     int infoH = lineH * numLines + lineVspace * (numLines - 1) + 2 * boxMargin;
 
     QRect winRect = geometry();
@@ -1051,11 +1065,18 @@ void ImageWindow::drawInfoBox()
     lineRect.setY(lineRect.y() + lineVspace + lineH);
     p.drawText(lineRect, line3);
 
-    if (line4Valid)
+    if (lineExposureValid)
     {
-        lineRect.setX(infoUpdateRegion.x() + infoUpdateRegion.width() - fm.horizontalAdvance(line4) - boxMargin);
+        lineRect.setX(infoUpdateRegion.x() + infoUpdateRegion.width() - fm.horizontalAdvance(lineExposure) - boxMargin);
         lineRect.setY(lineRect.y() + lineVspace + lineH);
-        p.drawText(lineRect, line4);
+        p.drawText(lineRect, lineExposure);
+    }
+
+    if (lineDateValid)
+    {
+        lineRect.setX(infoUpdateRegion.x() + infoUpdateRegion.width() - fm.horizontalAdvance(lineDate) - boxMargin);
+        lineRect.setY(lineRect.y() + lineVspace + lineH);
+        p.drawText(lineRect, lineDate);
     }
 
     lineRect.setX(infoUpdateRegion.x() + infoUpdateRegion.width() - fm.horizontalAdvance(line5) - boxMargin);

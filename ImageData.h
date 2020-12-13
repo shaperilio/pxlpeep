@@ -49,6 +49,7 @@ public:
     bool getEXIFISO(int &ISO) {ISO = EXIFISO; return haveEXIFISO;}
     bool getEXIFShutter(double &shutterms) {shutterms = EXIFShutter; return haveEXIFShutter;}
     bool getEXIFAperture(double &aperture) {aperture = EXIFAperture; return haveEXIFAperture;}
+    bool getEXIFDate(QString &date) {date = EXIFDate; return haveEXIFDate;}
     bool getEXIFEV(double &EV);
     bool getEXIFTemperatures(double &sensor, double &dsp, double &bat, double &pmic);
 
@@ -104,6 +105,8 @@ protected:
     double EXIFShutter;
     bool haveEXIFAperture;
     double EXIFAperture;
+    bool haveEXIFDate;
+    QString EXIFDate;
     bool haveEXIFTemperatures;
     double EXIFSensorTemp, EXIFDSPTemp, EXIFBatTemp, EXIFPMICTemp;
 };
