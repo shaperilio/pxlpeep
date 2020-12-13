@@ -1832,7 +1832,7 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
     Qt::KeyboardModifiers mods = QApplication::keyboardModifiers();
 
 //    cout << std::hex;
-//    cout << "Key press: 0x" << event->key() << " with modifier 0x" << mods << endl;
+//    cout << "Key press: 0x" << event->key() << " with QApplication::keyboardModifiers() = 0x" << mods << " and event->modifiers = 0x" << event->modifiers() << endl;
 //    cout << std::dec;
 
     auto sourceImage = sourceImageBuffer[currentImageBufferIndex];
@@ -1905,7 +1905,7 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                 break;
             }
 
-            if (mods == Qt::MetaModifier) {
+            if (mods == Qt::MetaModifier || mods ==Qt::AltModifier) {
                 int bucket = static_cast<int>(event->key()) - 0x30;
                 copyCurrentFileToBucket(bucket);
             }
