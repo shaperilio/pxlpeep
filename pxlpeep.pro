@@ -51,6 +51,7 @@ macx {
     INCLUDEPATH += /usr/local/opt/libomp/include
     LIBS += -L/usr/local/lib -lfreeimage -lomp
     ICON = loupe.icns
+    DEFINES += Q_OS_MACOS
 }
 
 win32 {
