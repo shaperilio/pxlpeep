@@ -44,8 +44,7 @@ ImageWindow::ImageWindow(int ID)
 #if defined(Q_OS_MACOS)
     // If we do a titleless window on Mac, you can't resize the window.
     // Tool windows have a smaller titlebar but they are always on top of the main window.
-//    setWindowFlags(Qt::Tool);
-//    setAttribute(Qt::WA_MacAlwaysShowToolWindow); // so it doesn't disappear when we lose focus.
+    setWindowFlags(Qt::CustomizeWindowHint); // no title, but not resizable
     windowFont.setPointSize(11);
 #elif defined(Q_OS_LINUX)
     // Ubuntu 20.04 LTS out of the box...
