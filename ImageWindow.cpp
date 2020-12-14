@@ -1501,8 +1501,11 @@ void ImageWindow::drawROI()
     QBrush blackBrush(Qt::black);
     p.setFont(windowFont);
 
-    QString coords = QString::asprintf("dx = %d, dy = %d -> h = %.2f", ROI.width(), ROI.height(),
-                                       sqrt((double)(ROI.width() * ROI.width() + ROI.height() * ROI.height())));
+    int w = ROI.width();
+    int h = ROI.height();
+    double d = sqrt(static_cast<double>(w * w + h * h));
+    cout << "ROI is " << w << " x " << h << " with diagonal " << d << endl;
+    QString coords = QString::asprintf("dx = %d, dy = %d -> h = %f", w, h, d);
     QFontMetrics fm(windowFont);
     QRect coordBox((ROI1Screen.x() + ROI2Screen.x() - fm.horizontalAdvance(coords)) / 2,
                 (ROI1Screen.y() + ROI2Screen.y() - fm.height()) / 2,
