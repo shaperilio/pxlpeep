@@ -50,7 +50,7 @@ ImageWindow::ImageWindow(int ID)
     // Ubuntu 20.04 LTS out of the box...
 //    setWindowFlags(Qt::Tool); // sizeable, stays on top of main window, but has title bar.
     // Looks like there's no way to get a titleless, sizable window in 20.04 LTS anymore...
-    setWindowFlags(Qt::CustomizeWindowHint); //no title bar, but not sizable.
+    setWindowFlags(Qt::Tool | Qt::CustomizeWindowHint); //no title bar, but not sizable.
     windowFont.setPointSize(8);
 #else
     windowFont.setPointSize(8);
