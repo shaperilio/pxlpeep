@@ -43,15 +43,15 @@ ImageWindow::ImageWindow(int ID)
     windowFont = QFont(family);
 #if defined(Q_OS_MACOS)
     // If we do a titleless window on Mac, you can't resize the window.
-    // Tool windows have a smaller titlebar but they are always on top of the main window.
-    setWindowFlags(Qt::CustomizeWindowHint); // no title, but not resizable
+    setWindowFlags(Qt::CustomizeWindowHint); //no title bar, but not sizable. Adding Qt::Tool keeps it on top.
     windowFont.setPointSize(11);
 #elif defined(Q_OS_LINUX)
     // Ubuntu 20.04 LTS out of the box...
 //    setWindowFlags(Qt::Tool); // sizeable, stays on top of main window, but has title bar. It also
     // doesn't appear as a top level window, which makes it annoying when multiple windows are open.
     // Looks like there's no way to get a titleless, sizable window in 20.04 LTS anymore...
-    setWindowFlags(Qt::CustomizeWindowHint); //no title bar, but not sizable.
+    //no title bar, but not sizable. Adding Qt::Dialog keeps it on top and it shows up as a top-level window.
+    setWindowFlags(Qt::CustomizeWindowHint | Qt::Dialog);
     windowFont.setPointSize(8);
 #else
     windowFont.setPointSize(8);
@@ -1504,8 +1504,8 @@ void ImageWindow::drawROI()
     int w = ROI.width();
     int h = ROI.height();
     double d = sqrt(static_cast<double>(w * w + h * h));
-    cout << "ROI is " << w << " x " << h << " with diagonal " << d << endl;
-    QString coords = QString::asprintf("dx = %d, dy = %d -> h = %f", w, h, d);
+//    cout << "ROI is " << w << " x " << h << " with diagonal " << d << endl;
+    QString coords = QString::asprintf("dx = %d, dy = %d -> h = %.2f", w, h, d);
     QFontMetrics fm(windowFont);
     QRect coordBox((ROI1Screen.x() + ROI2Screen.x() - fm.horizontalAdvance(coords)) / 2,
                 (ROI1Screen.y() + ROI2Screen.y() - fm.height()) / 2,
