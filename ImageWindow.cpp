@@ -110,9 +110,10 @@ void ImageWindow::setTitle(QString title)
 
 bool ImageWindow::readImage(QString filename)
 {
-    cout << endl;
     if (filename == "")
         return false;
+
+    cout << endl;
 
     filename = QFileInfo(filename).canonicalFilePath();
 
