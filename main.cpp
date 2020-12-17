@@ -6,10 +6,20 @@
 #include "definitions.h"
 #include <iostream>
 
+#include <stdio.h>
+
 using namespace std;
+void redirectOutput(char const * const filename) {
+    freopen(filename, "w", stdout);
+    freopen(filename, "w", stderr);
+    printf("printf works\n");
+    cout << "cout works\n";
+}
 
 int main(int argc, char *argv[])
 {
+//    redirectOutput("output.txt");
+
 #ifdef _DEBUG
     omp_set_num_threads(1);
 #else
