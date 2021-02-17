@@ -116,7 +116,11 @@ bool ImageWindow::readImage(QString filename)
     cout << endl;
 
     filename = QFileInfo(filename).canonicalFilePath();
-
+    if (!QFileInfo::exists(filename)) {
+        // Not sure why the hell filename won't show in release mode...
+        cout << "Image `" << filename.toStdString() << "` Does not exist!" << endl;
+        return false;
+    }
     reportBufferContents();
 
     int idx = -1;
