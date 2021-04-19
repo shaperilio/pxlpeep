@@ -1839,7 +1839,7 @@ bool ImageWindow::pasteFromClipboard()
         cerr << "Clibpard does not contain an image!" << endl;
         return false;
     }
-    QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".tif";
+    QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".png";
     if(cbImage.save(filename))
     {
         cout << "Saved clipboard image to " << filename.toStdString() << endl;
