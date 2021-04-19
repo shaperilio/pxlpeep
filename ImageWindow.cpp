@@ -558,11 +558,11 @@ void ImageWindow::handleMousePressEvent(QMouseEvent *event, bool /*forwarded*/)
 
     if(event->buttons() == Qt::LeftButton && event->modifiers() != Qt::ShiftModifier)
     {
-        panRef = event->globalPos();
+        panRef = event->globalPosition();
         setCursor(Qt::ClosedHandCursor);
     }
     else if (event->buttons() == Qt::RightButton)
-        mouseDragRef = event->globalPos() - frameGeometry().topLeft();
+        mouseDragRef = event->globalPosition() - frameGeometry().topLeft();
     else if (event->buttons() == Qt::LeftButton && event->modifiers() == Qt::ShiftModifier)
     {
         ROI1 = QPoint(floor(mapToScene(event->pos()).x() + 0.5), floor(mapToScene(event->pos()).y() + 0.5));
@@ -608,17 +608,17 @@ void ImageWindow::handleMouseMoveEvent(QMouseEvent *event, bool forwarded)
     {
         //Move the window.
         currentSnap = None;
-        QPoint delta = event->globalPos() - mouseDragRef;
-        move(delta);
+        QPointF delta = event->globalPosition() - mouseDragRef;
+        move(delta.toPoint());
     }
     else if (event->buttons() == Qt::LeftButton && event->modifiers() != Qt::ShiftModifier)
     {
         //Pan the image.
-        QPoint panDelta = event->globalPos() - panRef;
+        QPointF panDelta = event->globalPosition() - panRef;
         curMousePos += panDelta; //or the info box will show coordinates changing.
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - panDelta.x());
         verticalScrollBar()->setValue  (verticalScrollBar()->value()   - panDelta.y());
-        panRef = event->globalPos();
+        panRef = event->globalPosition();
     }
     else if (event->buttons() == Qt::LeftButton && event->modifiers() == Qt::ShiftModifier)
     {
@@ -956,7 +956,7 @@ void ImageWindow::drawInfoBox()
     }
 
     //Pixel coordinates
-    QPointF zoomedPos = mapToScene(curMousePos);
+    QPointF zoomedPos = mapToScene(curMousePos.toPoint());
     QString line5;
 
     double curX, curY;
@@ -1103,18 +1103,18 @@ void ImageWindow::drawCursorInfoBox()
     QPainter p(viewport());
     // If the zoom level is high enough, we will draw a marker that is locked to half-pixel units, and the info box will be
     // locked to that. Otherwise, we just follow the mouse cursor with the info box.
-    QPoint infoBoxRef; // reference coordinates for the inf box.
+    QPointF infoBoxRef; // reference coordinates for the inf box.
     double const markerZoomLevel = 64;
     QRect pixelMarkerRect;
 
     //Pixel coordinates
-    QPointF zoomedPos = mapToScene(curMousePos);
+    QPointF zoomedPos = mapToScene(curMousePos.toPoint());
 
     if (zoomFactor >= markerZoomLevel) {
         // Round them to the nearest 0.5 pixels.
         zoomedPos.setX(floor(zoomedPos.x() * 2 + 0.5) / 2.0);
         zoomedPos.setY(floor(zoomedPos.y() * 2 + 0.5) / 2.0);
-        QPoint pixelPosition = mapFromScene(zoomedPos);
+        QPointF pixelPosition = mapFromScene(zoomedPos);
         infoBoxRef = pixelPosition;
 
         // Draw a marker there.

@@ -213,7 +213,7 @@ protected:
     void zoom(int zoomIncrement);
 
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    QPoint mouseDragRef, panRef;
+    QPointF mouseDragRef, panRef;
     void checkROIpoint(QPoint &point);
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
@@ -223,7 +223,7 @@ protected:
     static const int boxMargin = 5;
     static const int boxPad    = 25;
 
-    QPoint curMousePos;
+    QPointF curMousePos;
     // keep track of which parts of the viewport the info and cursor info boxes take up
     // for repainting.
     QRect infoUpdateRegion, cursorInfoUpdateRegion;
