@@ -69,3 +69,7 @@ win32 {
 # and tab completion doesn't work for some reason? (hidden files?)
 # I had to do this for the following values of FILE:
 # libJPEG, libGIF, libTIFF, libPnG
+
+DISTFILES += \
+    pxlpeep.desktop \
+    pxlpeep.sh
