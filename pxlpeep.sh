@@ -1,2 +1,2 @@
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/home/barf/Qt/5.15.0/gcc_64/lib \
-/home/barf/build-pxlpeep-Qt_5_15_0_clang-Release/pxlpeep $1
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:~/Qt/6.0.3/gcc_64/lib \
+~/build-pxlpeep-Desktop_Qt_6_0_3_GCC_64bit-Release/pxlpeep $1
