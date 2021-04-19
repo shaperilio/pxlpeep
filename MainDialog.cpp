@@ -1,7 +1,6 @@
 #include "MainDialog.h"
 #include "ui_MainDialog.h"
 #include "ImageWindow.h"
-#include <QDesktopWidget>
 #include <QKeyEvent>
 #include <QDebug>
 #include <QFileDialog>

@@ -5,7 +5,6 @@
 #include <QDebug>
 #include <QScrollBar>
 #include <QFontDatabase>
-#include <QDesktopWidget>
 #include <QDir>
 #include <iostream>
 #include <QCollator>
@@ -707,9 +706,9 @@ void ImageWindow::zoomFit()
 
     zoomLevel = (int)floor(qMin(wLevel, hLevel));
     zoomFactor = pow(zoomStep, zoomLevel);
-    QMatrix scaleMatrix;
+    QTransform scaleMatrix;
     scaleMatrix.scale(zoomFactor, zoomFactor);
-    setTransform(QTransform(scaleMatrix));
+    setTransform(scaleMatrix);
     showCentered();
 }
 
@@ -778,9 +777,9 @@ void ImageWindow::zoom(int zoomIncrement)
         zoomFactor = pow(zoomStep, zoomLevel);
     }
     auto zoomLocationOnImageBefore = mapToScene(zoomCtr);
-    QMatrix scaleMatrix;
+    QTransform scaleMatrix;
     scaleMatrix.scale(zoomFactor, zoomFactor);
-    setTransform(QTransform(scaleMatrix));
+    setTransform(scaleMatrix);
     auto zoomCtrAfter = mapFromScene(zoomLocationOnImageBefore);
     auto zoomLocationDelta = zoomCtrAfter - zoomCtr;
     horizontalScrollBar()->setValue(horizontalScrollBar()->value() + zoomLocationDelta.x());
