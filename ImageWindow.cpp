@@ -1391,7 +1391,6 @@ void ImageWindow::drawColorbar()
         colorbarImage = QImage(colorbarRect.width(), colorbarRect.height(), QImage::Format_ARGB32);
 
         QPainter p(&colorbarImage);
-        p.setFont(windowFont);
         p.setBrush(Qt::black);
         p.drawRect(colorbarRect);
 
@@ -1417,13 +1416,6 @@ void ImageWindow::drawColorbar()
              }
         }
 
-        p.setPen(Qt::white);
-
-        p.drawText(boxMargin, boxMargin + textH, minTxt);
-        p.drawText(colorbarImage.width() - boxMargin - fm.horizontalAdvance(maxTxt), boxMargin + textH, maxTxt);
-
-        p.drawText(colorbarImage.width() / 2 - fm.horizontalAdvance(title) / 2, boxMargin + textH, title);
-
         translationIsFresh = false;
     }
 
@@ -1440,6 +1432,17 @@ void ImageWindow::drawColorbar()
     QRectF source(colorbarRect);
 
     p.drawImage(target, colorbarImage, source);
+
+    p.setPen(Qt::white);
+    p.setFont(windowFont);
+
+    auto const x = target.left();
+    auto const y = target.top();
+    p.drawText(x + boxMargin, y + boxMargin + textH, minTxt);
+    p.drawText(x + colorbarImage.width() - boxMargin - fm.horizontalAdvance(maxTxt), y + boxMargin + textH, maxTxt);
+
+    p.drawText(x + colorbarImage.width() / 2 - fm.horizontalAdvance(title) / 2, y + boxMargin + textH, title);
+
 }
 
 void ImageWindow::drawROI()
