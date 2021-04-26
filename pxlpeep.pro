@@ -59,6 +59,7 @@ win32 {
     LIBS += -L$$PWD/../FreeImageDLL/Dist/x64/ -lFreeImage
     INCLUDEPATH += $$PWD/../FreeImageDLL/Dist/x64
     DEPENDPATH += $$PWD/../FreeImageDLL/Dist/x64
+    RC_ICONS = loupe.ico
 }
 
 # Note. To debug this on Mac, you may have to do the following:
