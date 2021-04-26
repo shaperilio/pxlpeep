@@ -1538,7 +1538,11 @@ void ImageWindow::snapWindowTo(snapType snap, QScreen * screen)
     //seem to handle that very well.
     QRect screenDims;
     QList<QScreen *> screens = QGuiApplication::screens();
-    int numScreens = screens.size();
+#if defined(Q_OS_WIN)
+    int const numScreens = 100;
+ #else
+    int numScrens = screens.size();
+#endif
     QScreen * screensL2R[numScreens];
     memset(screensL2R, 0, numScreens * sizeof(QScreen *));
     for (int j = 0; j < numScreens; j++)
