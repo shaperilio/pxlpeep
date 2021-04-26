@@ -55,9 +55,10 @@ macx {
 }
 
 win32 {
-    LIBS += -L$$PWD/../../FreeImageDLL/Dist/x32/ -lFreeImage
-    INCLUDEPATH += $$PWD/../../FreeImageDLL/Dist/x32
-    DEPENDPATH += $$PWD/../../FreeImageDLL/Dist/x32
+    message("PWD is " $$PWD)
+    LIBS += -L$$PWD/../FreeImageDLL/Dist/x64/ -lFreeImage
+    INCLUDEPATH += $$PWD/../FreeImageDLL/Dist/x64
+    DEPENDPATH += $$PWD/../FreeImageDLL/Dist/x64
 }
 
 # Note. To debug this on Mac, you may have to do the following:
