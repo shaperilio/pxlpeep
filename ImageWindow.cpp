@@ -1832,6 +1832,9 @@ void ImageWindow::copyScreenshotToClipboard()
 }
 
 #include <QDateTime>
+#include <QMimeData>
+#include <QtNetwork>
+#include <QTime>
 bool ImageWindow::pasteFromClipboard()
 {
     QClipboard *clipboard = QApplication::clipboard();
@@ -1840,19 +1843,69 @@ bool ImageWindow::pasteFromClipboard()
         cerr << "Clibpard is null!" << endl;
         return false;
     }
-    QImage cbImage = clipboard->image();
-    if (cbImage.isNull())
-    {
-        cerr << "Clibpard does not contain an image!" << endl;
+    QMimeData const *data = clipboard->mimeData();
+
+    cout << "Clipboard data formats: " << data->formats().join(", ").toStdString() << endl;
+    if (data->hasImage()) {
+        cout << "Clipboard has an image." << endl;
+        QImage cbImage = clipboard->image();
+        if (cbImage.isNull())
+        {
+            cerr << "Clibpard image could not be retrieved!" << endl;
+            return false;
+        }
+        QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".png";
+        if(cbImage.save(filename))
+        {
+            cout << "Saved clipboard image to " << filename.toStdString() << endl;
+            return this->readImage(filename);
+        }
+        cerr << "Failed to save clipboard image to " << filename.toStdString() << endl;
         return false;
     }
-    QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".png";
-    if(cbImage.save(filename))
-    {
-        cout << "Saved clipboard image to " << filename.toStdString() << endl;
-        return this->readImage(filename);
+    if (data->hasText()) {
+        cout << "Clipboard has text: " << data->text().toStdString() << endl;
+        auto url = QUrl(data->text());
+        bool downloadComplete = false;
+        bool downloadFailed = false;
+
+        QNetworkAccessManager *manager = new QNetworkAccessManager;
+        QNetworkRequest request(url);
+        QObject::connect(manager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
+            QByteArray ba= reply->readAll();
+            QImage cbImage;
+            if (!cbImage.loadFromData(ba)) {
+                cerr << "Failed to download image from " << url.toString().toStdString() << endl;
+                downloadFailed = true;
+            }
+            cout << "Downloaded " << ba.size() << " bytes from " << url.toString().toStdString() << endl;
+            QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".png";
+            if(cbImage.save(filename))
+            {
+                cout << "Saved clipboard image to " << filename.toStdString() << endl;
+                this->readImage(filename);
+                downloadComplete = true;
+            } else {
+                cerr << "Failed to save clipboard image to " << filename.toStdString() << endl;
+                downloadFailed = true;
+            }
+        });
+        manager->get(request);
+        QTime dieTime= QTime::currentTime().addSecs(300);
+
+        while (!downloadComplete && !downloadFailed && QTime::currentTime() < dieTime){
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        }
+        if (!downloadComplete && !downloadFailed) {
+            cerr << "Timeout; download took too long." << endl;
+            return false;
+        }
+        if (downloadFailed) {
+            return false;
+        }
+        return true;
     }
-    cerr << "Failed to save clipboard image to " << filename.toStdString() << endl;
+    cerr << "Unrecognized clipboard format." << endl;
     return false;
 }
 
