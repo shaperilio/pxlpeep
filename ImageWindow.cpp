@@ -76,6 +76,8 @@ ImageWindow::ImageWindow(int ID)
     scene = nullptr;
     colormap = new Colormapper();
     dipFactor = 1;
+    clipboardTimerId = 0;
+    lastClipboardText = "";
  }
 
 void ImageWindow::resetWheelAccumulator()
@@ -1831,8 +1833,39 @@ void ImageWindow::copyScreenshotToClipboard()
     sendToClipboard(image);
 }
 
-#include <QDateTime>
+void ImageWindow::startMonitorClipboard() {
+    if (clipboardTimerId != 0)
+        return;
+    clipboardTimerId = startTimer(1000);
+    if (clipboardTimerId == 0)
+        cerr << "Could not start timer!" << endl;
+    cout << "Started monitoring clipboard." << endl;
+}
+
+void ImageWindow::stopMonitorClipboard() {
+    if (clipboardTimerId != 0)
+        killTimer(clipboardTimerId);
+}
+
 #include <QMimeData>
+void ImageWindow::timerEvent(QTimerEvent *event) {
+    if (event->timerId() != clipboardTimerId)
+        return;
+
+    QClipboard *clipboard = QApplication::clipboard();
+    if (clipboard == nullptr)
+    {
+        cerr << "Clibpard is null!" << endl;
+        return;
+    }
+    QMimeData const *data = clipboard->mimeData();
+    if (data->hasText() && data->text() != lastClipboardText) {
+        pasteFromClipboard();
+    }
+}
+
+
+#include <QDateTime>
 #include <QtNetwork>
 #include <QTime>
 bool ImageWindow::pasteFromClipboard()
@@ -1855,9 +1888,10 @@ bool ImageWindow::pasteFromClipboard()
             return false;
         }
         QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".png";
-        if(cbImage.save(filename))
+        if(cbImage.save(filename, "png", 100))
         {
             cout << "Saved clipboard image to " << filename.toStdString() << endl;
+            startMonitorClipboard();
             return this->readImage(filename);
         }
         cerr << "Failed to save clipboard image to " << filename.toStdString() << endl;
@@ -1865,36 +1899,45 @@ bool ImageWindow::pasteFromClipboard()
     }
     if (data->hasText()) {
         cout << "Clipboard has text: " << data->text().toStdString() << endl;
+        lastClipboardText = data->text();
         auto url = QUrl(data->text());
         bool downloadComplete = false;
         bool downloadFailed = false;
 
+        cout << "Downloading from " << url.toString().toStdString() << endl;
         QNetworkAccessManager *manager = new QNetworkAccessManager;
         QNetworkRequest request(url);
         QObject::connect(manager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
+            QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".png";
+            QObject::connect(reply, &QNetworkReply::errorOccurred, [&](QNetworkReply::NetworkError code) {
+                cerr << "An error occurred: (" << code << ") " << reply->errorString().toStdString() << endl;
+                downloadFailed = true;
+            });
             QByteArray ba= reply->readAll();
             QImage cbImage;
             if (!cbImage.loadFromData(ba)) {
                 cerr << "Failed to download image from " << url.toString().toStdString() << endl;
                 downloadFailed = true;
+                return;
             }
             cout << "Downloaded " << ba.size() << " bytes from " << url.toString().toStdString() << endl;
-            QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".png";
-            if(cbImage.save(filename))
+            if(cbImage.save(filename, "png", 100))
             {
                 cout << "Saved clipboard image to " << filename.toStdString() << endl;
                 this->readImage(filename);
                 downloadComplete = true;
+                return;
             } else {
                 cerr << "Failed to save clipboard image to " << filename.toStdString() << endl;
                 downloadFailed = true;
+                return;
             }
         });
         manager->get(request);
         QTime dieTime= QTime::currentTime().addSecs(300);
 
         while (!downloadComplete && !downloadFailed && QTime::currentTime() < dieTime){
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            QCoreApplication::processEvents(QEventLoop::AllEvents);
         }
         if (!downloadComplete && !downloadFailed) {
             cerr << "Timeout; download took too long." << endl;
@@ -1903,6 +1946,7 @@ bool ImageWindow::pasteFromClipboard()
         if (downloadFailed) {
             return false;
         }
+        startMonitorClipboard();
         return true;
     }
     cerr << "Unrecognized clipboard format." << endl;

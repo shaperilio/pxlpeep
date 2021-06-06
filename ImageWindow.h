@@ -282,6 +282,13 @@ protected:
     void saveScreenshotToFile();
 
     void setTitle(QString title);
+
+    int clipboardTimerId;
+    QString lastClipboardText;
+    void startMonitorClipboard();
+    void stopMonitorClipboard();
+    void timerEvent(QTimerEvent *event) override;
+
 signals:
     // These are connected to slots in MainDialog for inter-window syncing.
     // When something happens in an ImageWindow, these signals notify the main window.
