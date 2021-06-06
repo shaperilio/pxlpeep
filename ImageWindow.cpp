@@ -1106,13 +1106,13 @@ void ImageWindow::drawCursorInfoBox()
     // If the zoom level is high enough, we will draw a marker that is locked to half-pixel units, and the info box will be
     // locked to that. Otherwise, we just follow the mouse cursor with the info box.
     QPointF infoBoxRef; // reference coordinates for the inf box.
-    double const markerZoomLevel = 64;
+    double const markerZoomLevel = 32;
     QRect pixelMarkerRect;
 
     //Pixel coordinates
     QPointF zoomedPos = mapToScene(curMousePos.toPoint());
 
-    if (zoomFactor >= markerZoomLevel) {
+    if (floor(zoomFactor * 100 + .5) >= markerZoomLevel * 100) {
         // Round them to the nearest 0.5 pixels.
         zoomedPos.setX(floor(zoomedPos.x() * 2 + 0.5) / 2.0);
         zoomedPos.setY(floor(zoomedPos.y() * 2 + 0.5) / 2.0);
