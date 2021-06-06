@@ -1843,8 +1843,17 @@ void ImageWindow::startMonitorClipboard() {
 }
 
 void ImageWindow::stopMonitorClipboard() {
-    if (clipboardTimerId != 0)
+    if (clipboardTimerId != 0) {
         killTimer(clipboardTimerId);
+        cout << "Stopped monitoring clipboard." << endl;
+    }
+}
+
+void ImageWindow::toggleMonitorClipboard() {
+    if (clipboardTimerId == 0)
+        startMonitorClipboard();
+    else
+        stopMonitorClipboard();
 }
 
 #include <QMimeData>
@@ -1868,8 +1877,10 @@ void ImageWindow::timerEvent(QTimerEvent *event) {
 #include <QDateTime>
 #include <QtNetwork>
 #include <QTime>
+#include <QImageReader>
 bool ImageWindow::pasteFromClipboard()
 {
+    QImageReader::setAllocationLimit(512);
     QClipboard *clipboard = QApplication::clipboard();
     if (clipboard == nullptr)
     {
@@ -1891,7 +1902,6 @@ bool ImageWindow::pasteFromClipboard()
         if(cbImage.save(filename, "png", 100))
         {
             cout << "Saved clipboard image to " << filename.toStdString() << endl;
-            startMonitorClipboard();
             return this->readImage(filename);
         }
         cerr << "Failed to save clipboard image to " << filename.toStdString() << endl;
@@ -1900,7 +1910,7 @@ bool ImageWindow::pasteFromClipboard()
     if (data->hasText()) {
         cout << "Clipboard has text: " << data->text().toStdString() << endl;
         lastClipboardText = data->text();
-        auto url = QUrl(data->text());
+        auto url = QUrl(data->text().trimmed());
         bool downloadComplete = false;
         bool downloadFailed = false;
 
@@ -1946,7 +1956,6 @@ bool ImageWindow::pasteFromClipboard()
         if (downloadFailed) {
             return false;
         }
-        startMonitorClipboard();
         return true;
     }
     cerr << "Unrecognized clipboard format." << endl;
@@ -2046,7 +2055,7 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
                 break;
             }
 
-            if (mods == Qt::MetaModifier || mods ==Qt::AltModifier) {
+            if (mods == Qt::MetaModifier || mods == Qt::AltModifier) {
                 int bucket = static_cast<int>(event->key()) - 0x30;
                 copyCurrentFileToBucket(bucket);
             }
@@ -2213,6 +2222,11 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             if (!forwarded && mods == Qt::ControlModifier)
             {
                 pasteFromClipboard();
+                break;
+            }
+            if (!forwarded && mods == (Qt::ControlModifier | Qt::AltModifier))
+            {
+                toggleMonitorClipboard();
                 break;
             }
 
@@ -2455,6 +2469,7 @@ void ImageWindow::drawHelp()
     menu.append("M                           raise main window\n"); numLines++;
     menu.append("\n"); numLines++;
     menu.append("CTRL+V             paste image from clibpoard\n"); numLines++;
+    menu.append("CTRL+ALT+V       start/stop auto-pasting URLs\n"); numLines++;
     menu.append("CTRL+C                copy image to clibpoard\n"); numLines++;
     menu.append("CTRL+SHIFT+C     copy screenshot to clibpoard\n"); numLines++;
     menu.append("CTRL+ALT+C                 save image to file\n"); numLines++;

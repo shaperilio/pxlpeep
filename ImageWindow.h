@@ -287,6 +287,7 @@ protected:
     QString lastClipboardText;
     void startMonitorClipboard();
     void stopMonitorClipboard();
+    void toggleMonitorClipboard();
     void timerEvent(QTimerEvent *event) override;
 
 signals:
