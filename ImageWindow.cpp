@@ -646,14 +646,14 @@ void ImageWindow::handleMouseMoveEvent(QMouseEvent *event, bool forwarded)
             // So I make the update region slightly larger.
             // On Mac, the top left leaves a trail.
             QRect infoUpdate(infoUpdateRegion);
-            infoUpdate.adjust(-1, -1, 1, 1);
+            infoUpdate.adjust(-10, -10, 10, 10);
             viewport()->update(infoUpdate);
 //            cout << "viewport()->update for " << infoRect.left() << ", " << infoRect.top() << " to "
 //                 << infoRect.right() << ", " << infoRect.bottom() << endl;
 
             if (showCursorInfoBox) {
                 QRect cursorInfoUpdate(cursorInfoUpdateRegion);
-                cursorInfoUpdate.adjust(-1, -1, 1, 1);
+                cursorInfoUpdate.adjust(-10, -10, 10, 10);
                 viewport()->update(cursorInfoUpdate);
 //                cout << "viewport()->update for " << cursorInfoRect.left() << ", " << cursorInfoRect.top() << " to "
 //                     << cursorInfoRect.right() << ", " << cursorInfoRect.bottom() << endl;
