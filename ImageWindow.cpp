@@ -87,6 +87,7 @@ void ImageWindow::resetWheelAccumulator()
 
 void ImageWindow::closeEvent(QCloseEvent *event)
 {
+    stopMonitorClipboard();
     if (parent != nullptr) parent->imageWindowClosing(ID);
     if (scene != nullptr) delete scene;
     for (int i = 0; i < IMAGE_BUFFER_LENGTH; i++)
