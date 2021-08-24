@@ -1846,6 +1846,7 @@ void ImageWindow::stopMonitorClipboard() {
     if (clipboardTimerId != 0) {
         killTimer(clipboardTimerId);
         cout << "Stopped monitoring clipboard." << endl;
+        clipboardTimerId = 0;
     }
 }
 
