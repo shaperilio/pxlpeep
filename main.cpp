@@ -10,8 +10,9 @@
 
 using namespace std;
 void redirectOutput(char const * const filename) {
-    freopen(filename, "w", stdout);
-    freopen(filename, "w", stderr);
+    FILE *output_file;
+    freopen_s(&output_file, filename, "w", stdout);
+    freopen_s(&output_file, filename, "w", stderr);
     printf("printf works\n");
     cout << "cout works\n";
 }
