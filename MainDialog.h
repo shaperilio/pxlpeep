@@ -19,6 +19,7 @@ public:
     ~MainDialog() Q_DECL_OVERRIDE;
     void imageWindowClosing(int ID);
     QStringList filesToOpenAtStartup;
+    bool fillScreenAtStartup;
     bool syncOpenWindowsAtStartup;
     void setButtonText(int ID, QString text);
 
@@ -35,6 +36,7 @@ private slots:
     void mouseReleaseEventInImageWindow(QMouseEvent *event, int windowID);
     void keyPressedInImageWindow(QKeyEvent *event, int windowID);
     void keyReleasedInImageWindow(QKeyEvent *event, int windowID);
+    void fillScreenWithOpenWindows();
 
 public slots:
     int exec() Q_DECL_OVERRIDE; //must override this to get the right frameGeometry.
@@ -49,6 +51,9 @@ protected:
     static const int MAX_BUTTONS = 10;  //put this many buttons in the dialog box.
     QPushButton *imgButtons[MAX_BUTTONS];
     ImageWindow *imgWindows[MAX_BUTTONS];
+
+    int getNumImageWindows();  //returns the number of open images.
+    QList<int> getImageWindowList();  //returns a list with the indices of the open windows
 
     //These functions set and get the last used directory and type using the registry.
     const QString KEY_LAST_USED_DIR = "last_used_dir";

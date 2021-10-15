@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addPositionalArgument("image(s)", "the image(s) file to open");
+    parser.addOption(QCommandLineOption("f", "fill the screen with the images to open"));
     parser.addOption(QCommandLineOption("s", "sync open windows"));
 
     parser.process(app);
@@ -46,6 +47,7 @@ int main(int argc, char *argv[])
 
     MainDialog dlg;
     dlg.filesToOpenAtStartup = parser.positionalArguments();
+    dlg.fillScreenAtStartup = parser.optionNames().contains("f");
     dlg.syncOpenWindowsAtStartup = parser.optionNames().contains("s");
 
     return dlg.exec();

@@ -150,6 +150,20 @@ public:
 
     bool pasteFromClipboard();
 
+    enum snapType
+    {
+        None,
+        Left,
+        Right,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
+        Max,
+        Restore,
+    };
+    void snapWindowTo(snapType snap, QScreen * screen = 0);
+
 protected:
     int ID; // ID for the main window, to communicate back when we're done.
     QImage translatedImage;   //need an image to access pixels directly, but...
@@ -252,21 +266,7 @@ protected:
     bool showHelp;
     void drawHelp();
 
-    enum snapType
-    {
-        None,
-        Left,
-        Right,
-        TopLeft,
-        TopRight,
-        BottomLeft,
-        BottomRight,
-        Max,
-        Restore,
-    };
-
     snapType currentSnap;
-    void snapWindowTo(snapType snap, QScreen * screen = 0);
 
     QList<QString> fileList;
     QString nextFile, prevFile;

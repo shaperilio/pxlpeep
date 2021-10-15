@@ -47,6 +47,7 @@ MainDialog::MainDialog(QWidget *parent) :
     connect(ui->btnExit, &QPushButton::clicked, this, &MainDialog::exitApp);
     connect(ui->btnCloseAll, &QPushButton::clicked, this, &MainDialog::closeAllImageWindows);
     connect(ui->chkSyncWindows, &QCheckBox::stateChanged, this, &MainDialog::toggleSyncWindows);
+    connect(ui->btnFillScreen, &QPushButton::clicked, this, &MainDialog::fillScreenWithOpenWindows);
 }
 
 MainDialog::~MainDialog()
@@ -66,6 +67,22 @@ void MainDialog::closeAllImageWindows()
     for (int i = 0; i < MAX_BUTTONS; i++)
         if (imgWindows[i])
             imgWindows[i]->close();
+}
+
+int MainDialog::getNumImageWindows()
+{
+    return this->getImageWindowList().size();
+}
+
+QList<int> MainDialog::getImageWindowList()
+{
+    QList<int> windowIndices;
+
+    for (int i = 0; i < MAX_BUTTONS; i++)
+        if (imgWindows[i])
+            windowIndices.push_back(i);
+
+    return windowIndices;
 }
 
 void MainDialog::imageButtonClicked()
@@ -303,6 +320,29 @@ void MainDialog::openAndShow(int windowID, QString filename)
     showImageWindow(imgWindow);
 }
 
+void MainDialog::fillScreenWithOpenWindows()
+{
+    auto indices = this->getImageWindowList();
+    int numWindows = indices.size();
+    if (numWindows == 1) {
+        this->imgWindows[indices[0]]->snapWindowTo(ImageWindow::snapType::Max);
+    }
+    else if (numWindows == 2) {
+        this->imgWindows[indices[0]]->snapWindowTo(ImageWindow::snapType::Left);
+        this->imgWindows[indices[1]]->snapWindowTo(ImageWindow::snapType::Right);
+    }
+    else if (numWindows == 3 || numWindows == 4) {
+        this->imgWindows[indices[0]]->snapWindowTo(ImageWindow::snapType::TopLeft);
+        this->imgWindows[indices[1]]->snapWindowTo(ImageWindow::snapType::TopRight);
+        this->imgWindows[indices[2]]->snapWindowTo(ImageWindow::snapType::BottomLeft);
+        if (numWindows == 4)
+            this->imgWindows[indices[3]]->snapWindowTo(ImageWindow::snapType::BottomRight);
+    }
+    else {
+        cout << numWindows << " windows are open; don't know how to fill the screen." << endl;
+    }
+}
+
 void MainDialog::openAndPaste(int windowID)
 {
     ImageWindow *imgWindow;
@@ -386,6 +426,11 @@ int MainDialog::exec()
     this->move(r.width() - this->frameGeometry().width(), 0);
     for (QString image : filesToOpenAtStartup)
         openAndShow(-1, image);
+    if (this->fillScreenAtStartup) {
+        this->fillScreenWithOpenWindows();
+        for (int idx : this->getImageWindowList())
+            this->imgWindows[idx]->zoomFit();
+    }
     if (this->syncOpenWindowsAtStartup) {
         this->ui->chkSyncWindows->setChecked(true);
     }

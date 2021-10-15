@@ -1,3 +1,6 @@
+// Yes, you heard it here first: somehow QtCreator has lost the "connection"
+// between this file and the .ui file, so the .ui file is your visual guide to the
+// code you'll have to write here manually...
 /********************************************************************************
 ** Form generated from reading UI file 'MainDialog.ui'
 **
@@ -38,6 +41,7 @@ public:
     QPushButton *btnImage9;
     QPushButton *btnExit;
     QPushButton *btnCloseAll;
+    QPushButton *btnFillScreen;
     QCheckBox *chkSyncWindows;
 
     void setupUi(QDialog *MainDialog)
@@ -129,6 +133,10 @@ public:
         chkSyncWindows->setObjectName(QStringLiteral("chkSyncWindows"));
         chkSyncWindows->setGeometry(QRect(10, 365, 300, 27));
 
+        btnFillScreen = new QPushButton(MainDialog);
+        btnFillScreen->setObjectName(QStringLiteral("btnFillScreen"));
+        btnFillScreen->setGeometry(QRect(240, 360, 250, 31));
+
         retranslateUi(MainDialog);
 
         QMetaObject::connectSlotsByName(MainDialog);
@@ -150,6 +158,7 @@ public:
         btnExit->setText(QApplication::translate("MainDialog", "Exit", 0));
         btnCloseAll->setText(QApplication::translate("MainDialog", "Close all", 0));
         chkSyncWindows->setText(QApplication::translate("MainDialog", "Synchronize windows", 0));
+        btnFillScreen->setText(QApplication::translate("MainDialog", "Fill screen with open windows", 0));
     } // retranslateUi
 
 };
