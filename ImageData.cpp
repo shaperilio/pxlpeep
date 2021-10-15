@@ -510,7 +510,8 @@ bool ImageData::resetWhiteBalance()
 
 bool ImageData::doWhiteBalance(QRect &Area)
 {
-    cout << "White balance on ROI x: " << Area.x() << " y: " << Area.y() << " w: " << Area.width() << " h: " << Area.height() << endl;
+    cout << "White balance on ROI x: " << Area.x() << " y: " << Area.y()
+         << " w: " << Area.width() << " h: " << Area.height() << endl;
     if (getNumChannels() == 1)
         return doWhiteBalanceGrey(Area);
     else
@@ -601,7 +602,8 @@ bool ImageData::resetWhiteBalanceGrey()
     //ImageWindow is assigned as the painter.
     recalcMinMax();
 
-    // Reset the gains, or continuously "resetting" white balance will actually keep changing the image.
+    // Reset the gains, or continuously "resetting" white balance
+    // will actually keep changing the image.
     greyGains[0][0] = 1;
     greyGains[1][0] = 1;
     greyGains[0][1] = 1;
