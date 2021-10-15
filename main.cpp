@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
     parser.process(app);
 
-    for (QString image : parser.positionalArguments())
+    for (QString const &image : parser.positionalArguments())
         cout << "Will attempt to open " << image.toStdString() << " at startup." << endl;
 
     MainDialog dlg;

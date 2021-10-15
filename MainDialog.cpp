@@ -407,7 +407,7 @@ void MainDialog::dropEvent(QDropEvent *e)
     {
         QList<QUrl> urls = m->urls();
         cout << "Drag drop event with " << urls.length() << " URL(s):" << endl;
-        for (QUrl url : urls)
+        for (QUrl const &url : urls)
         {
             QString filename = url.toLocalFile();
             cout << filename.toStdString() << endl;
@@ -424,7 +424,7 @@ int MainDialog::exec()
     QDialog::show();            //show the window, so that frameGeometry will be correct.
     QRect r = QGuiApplication::primaryScreen()->geometry();
     this->move(r.width() - this->frameGeometry().width(), 0);
-    for (QString image : filesToOpenAtStartup)
+    for (QString const &image : filesToOpenAtStartup)
         openAndShow(-1, image);
     if (this->fillScreenAtStartup) {
         this->fillScreenWithOpenWindows();
@@ -458,7 +458,7 @@ void MainDialog::closeEvent(QCloseEvent *event)
 
         if (ret == QMessageBox::Yes)
         {
-            for ( QString fileToDelete : deletedFilesList)
+            for ( QString const &fileToDelete : deletedFilesList)
             {
                 QFile file(fileToDelete);
                 if (file.remove())
