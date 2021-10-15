@@ -40,34 +40,35 @@ MainDialog::MainDialog(QWidget *parent) :
     for (int i = 0; i < MAX_BUTTONS; i++)
     {
         imgWindows[i] = nullptr;
-        connect(imgButtons[i], &QPushButton::clicked, this, &MainDialog::slot_btnImage_clicked);
+        connect(imgButtons[i], &QPushButton::clicked, this, &MainDialog::imageButtonClicked);
         resetButton(i);
     }
+
+    connect(ui->btnExit, &QPushButton::clicked, this, &MainDialog::exitApp);
+    connect(ui->btnCloseAll, &QPushButton::clicked, this, &MainDialog::closeAllImageWindows);
+    connect(ui->chkSyncWindows, &QCheckBox::stateChanged, this, &MainDialog::toggleSyncWindows);
 }
 
 MainDialog::~MainDialog()
 {
-    this->on_btnCloseAll_clicked();
+    this->closeAllImageWindows();
 
     delete ui;
 }
 
-void MainDialog::on_btnExit_clicked()
+void MainDialog::exitApp()
 {
     this->close();
 }
 
-void MainDialog::on_btnCloseAll_clicked()
+void MainDialog::closeAllImageWindows()
 {
     for (int i = 0; i < MAX_BUTTONS; i++)
         if (imgWindows[i])
             imgWindows[i]->close();
 }
 
-// Don't start this with "on_" because we connect them manually in the constructor, and
-// Qt will try to connect this automatically just by looking at the name. See
-// https://linux.m2osw.com/qtwarning-qmetaobjectconnectslotsbyname-no-matching-signal-onsomethingevent
-void MainDialog::slot_btnImage_clicked()
+void MainDialog::imageButtonClicked()
 {
     QObject *obj = sender();
     QPushButton *button = static_cast<QPushButton *>(obj);
@@ -84,9 +85,9 @@ void MainDialog::slot_btnImage_clicked()
     }
 }
 
-void MainDialog::on_chkSyncWindows_stateChanged(int arg1)
+void MainDialog::toggleSyncWindows(int arg1)
 {
-    syncWindows = static_cast<bool>(arg1 == 2);
+    syncWindows = arg1 == Qt::CheckState::Checked;
     if (syncWindows)
     {
         for (int i = 0; i < MAX_BUTTONS; i++)

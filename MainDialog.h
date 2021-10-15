@@ -22,11 +22,11 @@ public:
     void setButtonText(int ID, QString text);
 
 private slots:
-    void on_btnExit_clicked();
-    void on_btnCloseAll_clicked();
-    void slot_btnImage_clicked();
+    void exitApp();
+    void closeAllImageWindows();
+    void imageButtonClicked();
 
-    void on_chkSyncWindows_stateChanged(int arg1);
+    void toggleSyncWindows(int arg1);
 
     void wheelEventInImageWindow(QWheelEvent *event, int windowID);
     void mousePressEventInImageWindow(QMouseEvent *event, int windowID);
