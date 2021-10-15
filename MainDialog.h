@@ -19,6 +19,7 @@ public:
     ~MainDialog() Q_DECL_OVERRIDE;
     void imageWindowClosing(int ID);
     QStringList filesToOpenAtStartup;
+    bool syncOpenWindowsAtStartup;
     void setButtonText(int ID, QString text);
 
 private slots:

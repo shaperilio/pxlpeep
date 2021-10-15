@@ -386,6 +386,9 @@ int MainDialog::exec()
     this->move(r.width() - this->frameGeometry().width(), 0);
     for (QString image : filesToOpenAtStartup)
         openAndShow(-1, image);
+    if (this->syncOpenWindowsAtStartup) {
+        this->ui->chkSyncWindows->setChecked(true);
+    }
     return QDialog::exec();     //make it modal.
 }
 
