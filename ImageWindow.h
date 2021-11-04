@@ -283,8 +283,16 @@ protected:
 
     void setTitle(QString title);
 
+    bool pasteFromBitmap();
+    bool pasteFromURL(QUrl const & url);
+
     int clipboardTimerId;
+    int downloadTimerId;
     QString lastClipboardText;
+    QList<QString> clipboardTextQueue;
+    void feedClipboardQueue(QString const & text);
+    bool inQueue;
+    bool processClipboardQueue();
     void startMonitorClipboard();
     void stopMonitorClipboard();
     void toggleMonitorClipboard();
