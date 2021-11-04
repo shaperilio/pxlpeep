@@ -1854,6 +1854,8 @@ void ImageWindow::stopMonitorClipboard() {
         killTimer(downloadTimerId);
         cout << "Stopped monitoring clipboard." << endl;
         clipboardTimerId = 0;
+        downloadTimerId = 0;
+        clipboardTextQueue.clear();
     }
 }
 
