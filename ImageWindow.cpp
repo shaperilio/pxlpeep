@@ -1866,7 +1866,7 @@ void ImageWindow::toggleMonitorClipboard() {
 
 void ImageWindow::feedClipboardQueue(const QString &text) {
     auto lines = text.split("\n", Qt::SkipEmptyParts);
-    if (lines.last() != lastClipboardText) {
+    if (lines.last().trimmed() != lastClipboardText) {
         for (auto const & line : lines) {
             if (line.trimmed().size() > 0)
                 clipboardTextQueue.append(line.trimmed());
@@ -1971,9 +1971,9 @@ bool ImageWindow::processClipboardQueue() {
     bool result = false;
     while (!clipboardTextQueue.isEmpty()) {
         auto url = QUrl(clipboardTextQueue.front());
+        clipboardTextQueue.pop_front();
         auto thisResult = pasteFromURL(url);
         result = thisResult or result;
-        clipboardTextQueue.pop_front();
     }
     inQueue = false;
     return result;
