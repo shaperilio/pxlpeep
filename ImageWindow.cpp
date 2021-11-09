@@ -1926,7 +1926,7 @@ bool ImageWindow::pasteFromURL(QUrl const & url) {
     QNetworkAccessManager *manager = new QNetworkAccessManager;
     QNetworkRequest request(url);
     QObject::connect(manager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
-        QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".png";
+        QString filename = QDir::tempPath() + "/temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".jpg";
         QObject::connect(reply, &QNetworkReply::errorOccurred, [&](QNetworkReply::NetworkError code) {
             cerr << "An error occurred: (" << code << ") " << reply->errorString().toStdString() << endl;
             downloadFailed = true;
@@ -1939,7 +1939,7 @@ bool ImageWindow::pasteFromURL(QUrl const & url) {
             return;
         }
         cout << "Downloaded " << ba.size() << " bytes from " << url.toString().toStdString() << endl;
-        if(cbImage.save(filename, "png", 100))
+        if(cbImage.save(filename, "jpg", 100))
         {
             cout << "Saved clipboard image to " << filename.toStdString() << endl;
             this->readImage(filename);
