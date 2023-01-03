@@ -2584,7 +2584,7 @@ void ImageWindow::syncWithFolder()
 
     fileListPos = -1;
 
-    cout << "syncWithFolder";
+    cout << "syncWithFolder (" << fileList.length() << " files)";
     for (int i = 0; i < fileList.length(); i++)
     {
         QString listFilename = curDirectory + fileList.at(i);
