@@ -27,6 +27,8 @@ On a mac:
 brew install freeimage
 ```
 
+On windows, just [download the package](https://freeimage.sourceforge.io/download.html) and extract the ZIP into a `FreeImageDLL` directory at the same level where you cloned the repo (or you'll have to modify the paths in the project file).
+
 It also requires OpenGL, which Qt seems to include but somehow not link correctly in Ubuntu so then `ld` can't find it. You can brute-force rectify this with
 
 ```
@@ -42,8 +44,10 @@ sudo apt install build-essential libomp-dev
 Note that to execute pxlpeep, if you installed Qt from their installer, you need to point it to the correct libraries directory, which by default is in your home folder:
 
 ```
-LD_LIBRARY_PATH=~/Qt/5.15.0/gcc_64/lib/ ./pxlpeep
+LD_LIBRARY_PATH=~/Qt/xxx/gcc_64/lib/ ./pxlpeep
 ```
+
+where `xxx` is the Qt version; assuming you have installed Qt in its default location.
 
 ## Building MacOS Catalina
 You have to install OpenMP.
@@ -69,3 +73,13 @@ MimeType=image/bmp;image/x-psd;image/tiff;image/jpeg;image/png;
 ```
 
 Install the file with `desktop-file-install` which will also validate that it's all fine. More details [here](https://help.ubuntu.com/community/UnityLaunchersAndDesktopFiles). 
+
+In Windows, you'll need to use Qt's deployment tool to copy all the necessary files to the build directory. You'll also have to copy `FreeImage.dll` into that directory.
+
+While inside the directory containing `pxlpeep.exe`, do
+
+```
+C:\Qt\xxx\msvc2019_64\bin\windeployqt.exe .
+```
+
+where `xxx` is the Qt version; assuming you have installed Qt in its default location.
