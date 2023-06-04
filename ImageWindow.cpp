@@ -1,5 +1,6 @@
 #include "definitions.h"
 #include "ImageWindow.h"
+#include "SetUnitDialog.h"
 #include <math.h>
 #include <QWheelEvent>
 #include <QDebug>
@@ -32,6 +33,8 @@ ImageWindow::ImageWindow(int ID)
     ROIisValid = false;
     currentSnap = None;
 
+    unitPerPix = 1;
+    unitName = QString("units");
 
     //Must set mouse tracking on the viewport, not "this", to get mouse move events without buttons!
     viewport()->setMouseTracking(true);
@@ -252,6 +255,11 @@ bool ImageWindow::setUserMax(double newMax)
         return translateImage();
 
     return true;
+}
+
+void ImageWindow::setCustomUnit(QString &name, double unitPerPix) {
+    this->unitName = name;
+    this->unitPerPix = unitPerPix;
 }
 
 bool ImageWindow::setImageRotation(ImageWindowRotation newRotation)
@@ -1517,7 +1525,15 @@ void ImageWindow::drawROI()
     int h = ROI.height();
     double d = sqrt(static_cast<double>(w * w + h * h));
 //    cout << "ROI is " << w << " x " << h << " with diagonal " << d << endl;
-    QString coords = QString::asprintf("dx = %d, dy = %d -> h = %.2f", w, h, d);
+    QString coords;
+    if (unitPerPix == 1) {
+        coords = QString::asprintf("dx = %d, dy = %d -> h = %.2f pix", w, h, d);
+    } else {
+        coords = QString::asprintf("dx = %d (%.3f), dy = %d (%.3f) -> h = %.2f (%.3f) pix (%s)",
+                                   w, w * unitPerPix,
+                                   h, h * unitPerPix,
+                                   d, d * unitPerPix, qPrintable(unitName));
+    }
     QFontMetrics fm(windowFont);
     QRect coordBox((ROI1Screen.x() + ROI2Screen.x() - fm.horizontalAdvance(coords)) / 2,
                 (ROI1Screen.y() + ROI2Screen.y() - fm.height()) / 2,
@@ -2435,6 +2451,20 @@ void ImageWindow::handleKeyPress(QKeyEvent *event, bool forwarded)
             viewport()->update();
             break;
         }
+        case Qt::Key_U:
+        {
+            SetUnitDialog unitSetter(this);
+            if (ROIisValid) {
+                double w = static_cast<double>(this->ROI.width());
+                double h = static_cast<double>(this->ROI.height());
+                double d = sqrt(w * w + h * h);
+                unitSetter.addPixVal(w);
+                unitSetter.addPixVal(h);
+                unitSetter.addPixVal(d);
+            }
+            unitSetter.exec();
+            break;
+        }
         case Qt::Key_Shift:
         case Qt::Key_Control:
         case Qt::Key_Alt:
@@ -2532,6 +2562,7 @@ void ImageWindow::drawHelp()
     menu.append("space                  toggle cursor info box\n"); numLines++;
     menu.append("C                            toggle color bar\n"); numLines++;
     menu.append("X                               toggle rulers\n"); numLines++;
+    menu.append("U              set user-defined units for pix\n"); numLines++;
     menu.append("\n"); numLines++;
     menu.append("V / SHIFT+V                   cycle colormaps\n"); numLines++;
     menu.append("F / SHIFT+F       toggle pixel value function\n"); numLines++;

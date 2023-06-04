@@ -15,19 +15,22 @@ TEMPLATE = app
 
 
 SOURCES +=\
+    SetUnitDialog.cpp \
     main.cpp \
     ImageWindow.cpp \
     ImageData.cpp \
     MainDialog.cpp
 
 HEADERS  += \
+    SetUnitDialog.h \
     colormapper.h \
     ImageWindow.h \
     ImageData.h \
     definitions.h \
     MainDialog.h
 FORMS    += \
-    MainDialog.ui
+    MainDialog.ui \
+    SetUnitDialog.ui
 
 RESOURCES += \
     pxlpeep.qrc

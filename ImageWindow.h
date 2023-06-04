@@ -94,6 +94,8 @@ public:
 
     bool setUserMin(double newMin);
     bool setUserMax(double newMax);
+    void setCustomUnit(QString &name, double unitPerPix);
+
     bool setScaleMode(ImageWindowScaling newMode);
     bool setImageFunction(ImageWindowFunction newFunction);
     bool setImageRotation(ImageWindowRotation newRotation);
@@ -179,6 +181,11 @@ protected:
 
     QGraphicsScene *scene;
     Colormapper *colormap;
+
+    // Allow people to calibrate, i.e. draw an ROI on a ruler and indicate
+    // how many physical units corresponds to one pixel.
+    double unitPerPix;
+    QString unitName;
 
     double userMin, userMax;
     ImageWindowScaling scaling;
